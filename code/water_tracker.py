@@ -2,15 +2,16 @@
 
 from kivy.app import App
 from kivy.lang import Builder
+from kivy.uix.button import Button
 
 
-class WaterTracker(App):
+class WaterTrackerApp(App):
     """Water Tracker program."""
     def build(self):
-        """Build Kivy app and open Add Water View."""
+        """Build Kivy app and open Daily View."""
         self.title = "Water Tracker"
-        self.root = Builder.load_file('add_water_view.kv')
+        self.root = Builder.load_file('daily_view.kv')
         return self.root
 
 
-WaterTracker().run()
+WaterTrackerApp().run()
