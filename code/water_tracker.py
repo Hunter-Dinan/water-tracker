@@ -2,7 +2,7 @@
 
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 
 from daily_view import DailyView
 from weekly_view import WeeklyView
@@ -23,7 +23,7 @@ class WaterTrackerApp(App):
         Builder.load_file('kv-files/yearly_view.kv')
         Builder.load_file('kv-files/social_view.kv')
 
-        screen_manager = ScreenManager()
+        screen_manager = ScreenManager(transition=NoTransition())
         screen_manager.add_widget(DailyView(name='DailyView'))
         screen_manager.add_widget(WeeklyView(name='WeeklyView'))
         screen_manager.add_widget(MonthlyView(name='MonthlyView'))
