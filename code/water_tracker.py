@@ -2,7 +2,10 @@
 
 from kivy.app import App
 from kivy.lang import Builder
-from kivy.uix.button import Button
+from kivy.uix.screenmanager import ScreenManager, Screen
+
+from daily_view import DailyView
+from weekly_view import WeeklyView
 
 
 class WaterTrackerApp(App):
@@ -10,8 +13,15 @@ class WaterTrackerApp(App):
     def build(self):
         """Build Kivy app and open Daily View."""
         self.title = "Water Tracker"
-        self.root = Builder.load_file('daily_view.kv')
-        return self.root
+
+        Builder.load_file('daily_view.kv')
+        Builder.load_file('weekly_view.kv')
+
+        screen_manager = ScreenManager()
+        screen_manager.add_widget(DailyView(name='DailyView'))
+        screen_manager.add_widget(WeeklyView(name='WeeklyView'))
+        return screen_manager
 
 
-WaterTrackerApp().run()
+if __name__ == '__main__':
+    WaterTrackerApp().run()
