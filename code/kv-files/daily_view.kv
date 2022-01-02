@@ -1,0 +1,22 @@
+<DailyView>:
+    BoxLayout:
+        orientation:'vertical'
+        Button:
+            text: 'Daily'
+        BoxLayout:
+            orientation: 'horizontal'
+            Button:
+                text: 'Daily'
+                on_press: root.manager.current = 'DailyView'
+            Button:
+                text: 'Weekly'
+                on_press: root.manager.current = 'WeeklyView'
+            Button:
+                text: 'Monthly'
+                on_press: root.manager.current = 'MonthlyView'
+            Button:
+                text: 'Yearly'
+                on_press: root.manager.current = 'YearlyView'
+            Button:
+                text: 'Social'
+                on_press: root.manager.current = 'SocialView'
