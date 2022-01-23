@@ -1,24 +1,40 @@
+import datetime
+
 MENU = """Console Water Tracker Menu
 (A)dd water
 (D)aily view
 (W)eekly view
 (Q)uit
 """
+WATER_DATA_FILE = "daily_water_save.csv"
+REQUIRED_DAILY_WATER_AMOUNT_LITRES = 3.5
+CURRENT_DATE_INDEX = 0
+WATER_AMOUNT_INDEX = 1
 
 
 def main():
-    current_water_amount_litres = 0.0
-    required_daily_water_amount_litres = 3.5
+    # Date format: YYYY-MM-DD
+    current_date = datetime.date.today()
 
+    # Daily water data format: ['YYYY-MM-DD,0.0,n', 'YYYY-MM-DD,0.0,n']
+    daily_water_data = get_daily_water_data()
+
+    # Current water data format: ['YYYY-MM-DD', '0.0', 'n']
+    current_water_data = get_current_water_data(daily_water_data)
+
+    current_water_amount_litres = current_water_data[WATER_AMOUNT_INDEX]
+
+    print("Date:{}".format(current_date))
     print(MENU)
     menu_input = input(">>> ").upper()
     while menu_input != "Q":
         if menu_input == "A":
             add_water_amount_litres = get_water_amount_litres(current_water_amount_litres,
-                                                              required_daily_water_amount_litres)
+                                                              REQUIRED_DAILY_WATER_AMOUNT_LITRES)
             current_water_amount_litres += add_water_amount_litres
         elif menu_input == "D":
-            display_daily_water_intake(current_water_amount_litres, required_daily_water_amount_litres)
+            display_daily_water_intake_litres(current_water_amount_litres,
+                                              REQUIRED_DAILY_WATER_AMOUNT_LITRES)
         elif menu_input == "W":
             print("W")
         else:
@@ -36,9 +52,22 @@ def get_water_amount_litres(current_water_amount, required_daily_water_amount):
     return water_amount
 
 
-def display_daily_water_intake(current_water_amount, required_daily_water_amount):
+def display_daily_water_intake_litres(current_water_amount, required_daily_water_amount):
     print("Current daily water intake: {}L , Required daily water intake: {}L".format(
         current_water_amount, required_daily_water_amount))
+
+
+def get_daily_water_data():
+    daily_water_data = []
+    input_file = open(WATER_DATA_FILE, "r")
+    for line in input_file:
+        line = line.strip()
+        daily_water_data.append(line)
+    return daily_water_data
+
+
+def get_current_water_data(daily_water_data: list):
+    return daily_water_data[CURRENT_DATE_INDEX].split(',')
 
 
 main()
