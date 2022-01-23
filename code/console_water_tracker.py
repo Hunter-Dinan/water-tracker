@@ -22,9 +22,13 @@ def main():
 
     # Current water data format: ['YYYY-MM-DD', '0.0', 'n']
     current_water_data = get_current_water_data(current_date, daily_water_data)
-    print(current_water_data)
 
-    current_water_amount_litres = float(current_water_data[WATER_AMOUNT_INDEX])
+    current_water_amount_litres = current_water_data[WATER_AMOUNT_INDEX]
+
+    # Tests
+    print(daily_water_data)
+    print(current_water_data)
+    print(current_water_amount_litres)
 
     print("Date:{}".format(current_date))
     print(MENU)
@@ -64,12 +68,14 @@ def get_daily_water_data():
     input_file = open(WATER_DATA_FILE, "r")
     for line in input_file:
         line = line.strip()
-        daily_water_data.append(line)
+        water_data = line.split(',')
+        water_data[WATER_AMOUNT_INDEX] = float(water_data[WATER_AMOUNT_INDEX])
+        daily_water_data.append(water_data)
     return daily_water_data
 
 
 def get_current_water_data(current_date, daily_water_data: list):
-    latest_water_data = daily_water_data[LATEST_DATA_INDEX].split(',')
+    latest_water_data = daily_water_data[LATEST_DATA_INDEX]
     if current_date == latest_water_data[DATE_INDEX]:
         return latest_water_data
     else:
