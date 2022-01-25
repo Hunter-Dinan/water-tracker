@@ -46,9 +46,11 @@ def main():
                                                                   REQUIRED_DAILY_WATER_QUANTITY_LITRES)
             current_water_quantity_litres += add_water_quantity_litres
 
+            update_current_water_data(current_water_quantity_litres, current_water_data)
+
             if current_water_data[COMPLETED_INDEX] != COMPLETED_CHARACTER:
                 if current_water_quantity_litres >= REQUIRED_DAILY_WATER_QUANTITY_LITRES:
-                    mark_daily_water_completed()
+                    mark_daily_water_completed(current_water_data)
                     print("You have reached the minimum required daily water intake!")
         elif menu_input == "D":
             display_daily_water_intake_litres(current_water_quantity_litres,
@@ -62,7 +64,7 @@ def main():
             print("Minimum required daily water intake reached!")
         print(MENU)
         menu_input = input(">>> ").upper()
-    format_water_data_for_save(current_water_data, daily_water_data)
+    format_water_data_for_save(current_date, current_water_data, daily_water_data)
     save_water_data_in_file(daily_water_data, WATER_DATA_FILE)
     print("Goodbye")
 
@@ -125,11 +127,14 @@ def save_water_data_in_file(daily_water_data, filename):
     output_file.close()
 
 
-def format_water_data_for_save(current_water_data, daily_water_data):
-    daily_water_data.append(current_water_data)
+def format_water_data_for_save(current_date, current_water_data, daily_water_data):
+    latest_water_data = daily_water_data[LATEST_DATA_INDEX]
+    if current_date != latest_water_data[DATE_INDEX]:
+        daily_water_data.append(current_water_data)
 
     # Convert date strings and sort into descending order (Latest date at top)
     for water_data in daily_water_data:
+        print(water_data)
         water_data[DATE_INDEX] = convert_date_str_to_datetime_obj(water_data[DATE_INDEX])
     daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
 
@@ -144,6 +149,11 @@ def format_water_data_for_save(current_water_data, daily_water_data):
 def mark_daily_water_completed(water_data):
     water_data[COMPLETED_INDEX] = "y"
     return water_data
+
+
+def update_current_water_data(current_water_quantity, current_water_data):
+    current_water_data[WATER_QUANTITY_INDEX] = current_water_quantity
+    return current_water_data
 
 
 if __name__ == '__main__':
