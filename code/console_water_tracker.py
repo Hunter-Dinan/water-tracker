@@ -1,4 +1,5 @@
 import datetime
+from operator import itemgetter
 
 MENU = """Console Water Tracker Menu
 (A)dd water
@@ -11,17 +12,20 @@ REQUIRED_DAILY_WATER_QUANTITY_LITRES = 3.5
 LATEST_DATA_INDEX = 0
 DATE_INDEX = 0
 WATER_QUANTITY_INDEX = 1
+COMPLETED_INDEX = 2
+END_OF_DATE_INDEX = 10
 
 
 def main():
-    # Date format: YYYY-MM-DD
-    current_date = str(datetime.date.today())
+    # Initial date format: YYYY-MM-DD
+    current_date = datetime.date.today()
+    current_date_str = str(current_date)
 
     # Daily water data format: ['YYYY-MM-DD,0.0,n', 'YYYY-MM-DD,0.0,n']
     daily_water_data = get_daily_water_data()
 
     # Current water data format: ['YYYY-MM-DD', '0.0', 'n']
-    current_water_data = get_current_water_data(current_date, daily_water_data)
+    current_water_data = get_current_water_data(current_date_str, daily_water_data)
 
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
@@ -30,7 +34,7 @@ def main():
     print(current_water_data)
     print(current_water_quantity_litres)
 
-    print("Date:{}".format(current_date))
+    print("Date:{}".format(current_date_str))
     print(MENU)
     menu_input = input(">>> ").upper()
     while menu_input != "Q":
@@ -49,6 +53,7 @@ def main():
             print("Invalid menu choice")
         print(MENU)
         menu_input = input(">>> ").upper()
+    save_water_data_in_file(current_water_data, daily_water_data)
     print("Goodbye")
 
 
@@ -74,12 +79,12 @@ def get_daily_water_data():
     return daily_water_data
 
 
-def get_current_water_data(current_date, daily_water_data: list):
+def get_current_water_data(current_date_str, daily_water_data: list):
     latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-    if current_date == latest_water_data[DATE_INDEX]:
+    if current_date_str == latest_water_data[DATE_INDEX]:
         return latest_water_data
     else:
-        return [current_date, 0.0, 'n']
+        return [current_date_str, 0.0, 'n']
 
 
 def get_valid_float(prompt):
@@ -95,6 +100,32 @@ def get_valid_float(prompt):
         except ValueError:
             print("Invalid input; enter a valid number")
     return float_number
+
+
+def convert_date_str_to_datetime_obj(date_str):
+    datetime_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+    return datetime_obj
+
+
+def save_water_data_in_file(current_water_data, daily_water_data):
+    daily_water_data.append(current_water_data)
+
+    # Convert date strings and sort into descending order (Latest date at top)
+    for water_data in daily_water_data:
+        water_data[DATE_INDEX] = convert_date_str_to_datetime_obj(water_data[DATE_INDEX])
+    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
+
+    # Format default datetime string output into YYYY-MM-DD
+    for water_data in daily_water_data:
+        raw_date = str(water_data[DATE_INDEX])
+        formatted_date = raw_date[:END_OF_DATE_INDEX]
+        water_data[DATE_INDEX] = formatted_date
+
+    output_file = open(WATER_DATA_FILE, "w")
+    for water_data in daily_water_data:
+        print("{},{},{}".format(water_data[DATE_INDEX], water_data[WATER_QUANTITY_INDEX],
+                                water_data[COMPLETED_INDEX]), file=output_file)
+    output_file.close()
 
 
 if __name__ == '__main__':
