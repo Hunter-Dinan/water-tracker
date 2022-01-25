@@ -53,7 +53,8 @@ def main():
             print("Invalid menu choice")
         print(MENU)
         menu_input = input(">>> ").upper()
-    save_water_data_in_file(current_water_data, daily_water_data)
+    format_water_data_for_save(current_water_data, daily_water_data)
+    save_water_data_in_file(daily_water_data, WATER_DATA_FILE)
     print("Goodbye")
 
 
@@ -107,7 +108,15 @@ def convert_date_str_to_datetime_obj(date_str):
     return datetime_obj
 
 
-def save_water_data_in_file(current_water_data, daily_water_data):
+def save_water_data_in_file(daily_water_data, filename):
+    output_file = open(filename, "w")
+    for water_data in daily_water_data:
+        print("{},{},{}".format(water_data[DATE_INDEX], water_data[WATER_QUANTITY_INDEX],
+                                water_data[COMPLETED_INDEX]), file=output_file)
+    output_file.close()
+
+
+def format_water_data_for_save(current_water_data, daily_water_data):
     daily_water_data.append(current_water_data)
 
     # Convert date strings and sort into descending order (Latest date at top)
@@ -120,12 +129,7 @@ def save_water_data_in_file(current_water_data, daily_water_data):
         raw_date = str(water_data[DATE_INDEX])
         formatted_date = raw_date[:END_OF_DATE_INDEX]
         water_data[DATE_INDEX] = formatted_date
-
-    output_file = open(WATER_DATA_FILE, "w")
-    for water_data in daily_water_data:
-        print("{},{},{}".format(water_data[DATE_INDEX], water_data[WATER_QUANTITY_INDEX],
-                                water_data[COMPLETED_INDEX]), file=output_file)
-    output_file.close()
+    return daily_water_data
 
 
 if __name__ == '__main__':
