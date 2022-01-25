@@ -5,8 +5,8 @@ MENU = """Console Water Tracker Menu
 (A)dd water
 (D)aily view
 (W)eekly view
-(Q)uit
-"""
+(M)onthly view
+(Q)uit"""
 WATER_DATA_FILE = "daily_water_save.csv"
 REQUIRED_DAILY_WATER_QUANTITY_LITRES = 3.5
 LATEST_DATA_INDEX = 0
@@ -30,11 +30,6 @@ def main():
 
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
-    # Tests
-    print(daily_water_data)
-    print(current_water_data)
-    print(current_water_quantity_litres)
-
     print("Date:{}".format(current_date))
     print(MENU)
     menu_input = input(">>> ").upper()
@@ -57,6 +52,8 @@ def main():
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
         elif menu_input == "W":
             print("Weekly view")
+        elif menu_input == "M":
+            print("Monthly view")
         else:
             print("Invalid menu choice")
 
@@ -66,7 +63,7 @@ def main():
         menu_input = input(">>> ").upper()
     format_water_data_for_save(current_date, current_water_data, daily_water_data)
     save_water_data_in_file(daily_water_data, WATER_DATA_FILE)
-    print("Goodbye")
+    print("Program terminated.")
 
 
 def get_water_quantity_litres(current_water_quantity, required_daily_water_quantity):
@@ -134,7 +131,6 @@ def format_water_data_for_save(current_date, current_water_data, daily_water_dat
 
     # Convert date strings and sort into descending order (Latest date at top)
     for water_data in daily_water_data:
-        print(water_data)
         water_data[DATE_INDEX] = convert_date_str_to_datetime_obj(water_data[DATE_INDEX])
     daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
 
