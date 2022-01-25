@@ -14,6 +14,7 @@ DATE_INDEX = 0
 WATER_QUANTITY_INDEX = 1
 COMPLETED_INDEX = 2
 END_OF_DATE_INDEX = 10
+COMPLETED_CHARACTER = 'y'
 
 
 def main():
@@ -44,6 +45,11 @@ def main():
             add_water_quantity_litres = get_water_quantity_litres(current_water_quantity_litres,
                                                                   REQUIRED_DAILY_WATER_QUANTITY_LITRES)
             current_water_quantity_litres += add_water_quantity_litres
+
+            if current_water_data[COMPLETED_INDEX] != COMPLETED_CHARACTER:
+                if current_water_quantity_litres >= REQUIRED_DAILY_WATER_QUANTITY_LITRES:
+                    mark_daily_water_completed()
+                    print("You have reached the minimum required daily water intake!")
         elif menu_input == "D":
             display_daily_water_intake_litres(current_water_quantity_litres,
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
@@ -51,6 +57,9 @@ def main():
             print("Weekly view")
         else:
             print("Invalid menu choice")
+
+        if current_water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+            print("Minimum required daily water intake reached!")
         print(MENU)
         menu_input = input(">>> ").upper()
     format_water_data_for_save(current_water_data, daily_water_data)
@@ -85,8 +94,7 @@ def get_current_water_data(current_date, daily_water_data: list):
         latest_water_data = daily_water_data[LATEST_DATA_INDEX]
         if current_date == latest_water_data[DATE_INDEX]:
             return latest_water_data
-    else:
-        return [current_date, 0.0, 'n']
+    return [current_date, 0.0, 'n']
 
 
 def get_valid_float(prompt):
@@ -131,6 +139,11 @@ def format_water_data_for_save(current_water_data, daily_water_data):
         formatted_date = raw_date[:END_OF_DATE_INDEX]
         water_data[DATE_INDEX] = formatted_date
     return daily_water_data
+
+
+def mark_daily_water_completed(water_data):
+    water_data[COMPLETED_INDEX] = "y"
+    return water_data
 
 
 if __name__ == '__main__':
