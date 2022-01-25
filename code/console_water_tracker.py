@@ -18,14 +18,14 @@ END_OF_DATE_INDEX = 10
 
 def main():
     # Initial date format: YYYY-MM-DD
-    current_date = datetime.date.today()
-    current_date_str = str(current_date)
+    datetime_current_date = datetime.date.today()
+    current_date = str(datetime_current_date)
 
     # Daily water data format: ['YYYY-MM-DD,0.0,n', 'YYYY-MM-DD,0.0,n']
     daily_water_data = get_daily_water_data()
 
     # Current water data format: ['YYYY-MM-DD', '0.0', 'n']
-    current_water_data = get_current_water_data(current_date_str, daily_water_data)
+    current_water_data = get_current_water_data(current_date, daily_water_data)
 
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
@@ -34,7 +34,7 @@ def main():
     print(current_water_data)
     print(current_water_quantity_litres)
 
-    print("Date:{}".format(current_date_str))
+    print("Date:{}".format(current_date))
     print(MENU)
     menu_input = input(">>> ").upper()
     while menu_input != "Q":
@@ -80,12 +80,13 @@ def get_daily_water_data():
     return daily_water_data
 
 
-def get_current_water_data(current_date_str, daily_water_data: list):
-    latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-    if current_date_str == latest_water_data[DATE_INDEX]:
-        return latest_water_data
+def get_current_water_data(current_date, daily_water_data: list):
+    if daily_water_data:
+        latest_water_data = daily_water_data[LATEST_DATA_INDEX]
+        if current_date == latest_water_data[DATE_INDEX]:
+            return latest_water_data
     else:
-        return [current_date_str, 0.0, 'n']
+        return [current_date, 0.0, 'n']
 
 
 def get_valid_float(prompt):
