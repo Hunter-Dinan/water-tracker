@@ -65,6 +65,12 @@ def main():
             # get data from that week
         elif menu_input == "M":
             print("Monthly view")
+            month_dates_formatted = []
+            month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
+            for week_dates in month_dates:
+                for day_date in week_dates:
+                    month_dates_formatted.append(day_date)
+            print(month_dates_formatted)
         else:
             print("Invalid menu choice")
 
