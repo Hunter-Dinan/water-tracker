@@ -28,6 +28,7 @@ def main():
 
     # Current water data format: ['YYYY-MM-DD', '0.0', 'n']
     current_water_data = get_current_water_data(datetime_current_date, daily_water_data)
+    print(current_water_data)
 
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
@@ -85,13 +86,21 @@ def get_daily_water_data():
         line = line.strip()
         water_data = line.split(',')
         water_data[WATER_QUANTITY_INDEX] = float(water_data[WATER_QUANTITY_INDEX])
+
+        # Convert date string to datetime.date object
         date = water_data[DATE_INDEX]
-        year = int(date[:4])
-        month = int(date[5:7])
-        day = int(date[8:10])
-        water_data[DATE_INDEX] = datetime.date(year, month, day)
+        water_data[DATE_INDEX] = convert_date_str_to_date_obj(date)
+
         daily_water_data.append(water_data)
     return daily_water_data
+
+
+def convert_date_str_to_date_obj(date_str):
+    # date_str format: YYYY-MM-DD
+    year = int(date_str[:4])
+    month = int(date_str[5:7])
+    day = int(date_str[8:10])
+    return datetime.date(year, month, day)
 
 
 def get_current_water_data(datetime_current_date, daily_water_data: list):
@@ -115,11 +124,6 @@ def get_valid_float(prompt):
         except ValueError:
             print("Invalid input; enter a valid number")
     return float_number
-
-
-def convert_date_str_to_date_obj(date_str):
-    datetime_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
-    return datetime_obj
 
 
 def save_water_data_in_file(daily_water_data, filename):
