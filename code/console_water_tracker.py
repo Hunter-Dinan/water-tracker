@@ -24,6 +24,7 @@ def main():
 
     # Daily water data format: ['YYYY-MM-DD,0.0,n', 'YYYY-MM-DD,0.0,n']
     daily_water_data = get_daily_water_data()
+    print(daily_water_data)
 
     # Current water data format: ['YYYY-MM-DD', '0.0', 'n']
     current_water_data = get_current_water_data(current_date, daily_water_data)
@@ -84,6 +85,7 @@ def get_daily_water_data():
         line = line.strip()
         water_data = line.split(',')
         water_data[WATER_QUANTITY_INDEX] = float(water_data[WATER_QUANTITY_INDEX])
+        water_data[DATE_INDEX] = datetime.datetime.strptime(water_data[DATE_INDEX], "%Y-%m-%d")
         daily_water_data.append(water_data)
     return daily_water_data
 
