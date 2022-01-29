@@ -1,4 +1,5 @@
 import datetime
+import calendar
 from operator import itemgetter
 
 MENU = """Console Water Tracker Menu
@@ -18,21 +19,21 @@ COMPLETED_CHARACTER = 'y'
 
 
 def main():
+    calendar_dates = calendar.Calendar()
+
     # Initial date format in save file: YYYY-MM-DD
     # Use datetime.date objects within program
-    datetime_current_date = datetime.date.today()
+    current_date = datetime.date.today()
 
     # Daily water data format: ['datetime.date(YYYY, MM, DD),0.0,n', 'datetime.datetime(YYYY, MM, DD),0.0,n']
     daily_water_data = get_daily_water_data()
-    print(daily_water_data)
 
-    # Current water data format: ['YYYY-MM-DD', '0.0', 'n']
-    current_water_data = get_current_water_data(datetime_current_date, daily_water_data)
-    print(current_water_data)
+    # Current water data format: ['datetime.date(YYYY, MM, DD)', '0.0', 'n']
+    current_water_data = get_current_water_data(current_date, daily_water_data)
 
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
-    print("Date:{}".format(datetime_current_date))
+    print("Date:{}".format(current_date))
     print(MENU)
     menu_input = input(">>> ").upper()
     while menu_input != "Q":
@@ -54,6 +55,14 @@ def main():
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
         elif menu_input == "W":
             print("Weekly view")
+            month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
+            for week_dates in month_dates:
+                for day_date in week_dates:
+                    if current_date == day_date:
+                        current_week = week_dates
+                        print(current_week)
+            # find out which week it is
+            # get data from that week
         elif menu_input == "M":
             print("Monthly view")
         else:
@@ -63,7 +72,7 @@ def main():
             print("Minimum required daily water intake reached!")
         print(MENU)
         menu_input = input(">>> ").upper()
-    format_water_data_for_save(datetime_current_date, current_water_data, daily_water_data)
+    format_water_data_for_save(current_date, current_water_data, daily_water_data)
     save_water_data_in_file(daily_water_data, WATER_DATA_FILE)
     print("Program terminated.")
 
@@ -85,9 +94,8 @@ def get_daily_water_data():
     for line in input_file:
         line = line.strip()
         water_data = line.split(',')
+        
         water_data[WATER_QUANTITY_INDEX] = float(water_data[WATER_QUANTITY_INDEX])
-
-        # Convert date string to datetime.date object
         date = water_data[DATE_INDEX]
         water_data[DATE_INDEX] = convert_date_str_to_date_obj(date)
 
@@ -103,12 +111,12 @@ def convert_date_str_to_date_obj(date_str):
     return datetime.date(year, month, day)
 
 
-def get_current_water_data(datetime_current_date, daily_water_data: list):
+def get_current_water_data(current_date, daily_water_data: list):
     if daily_water_data:
         latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-        if datetime_current_date == latest_water_data[DATE_INDEX]:
+        if current_date == latest_water_data[DATE_INDEX]:
             return latest_water_data
-    return [datetime_current_date, 0.0, 'n']
+    return [current_date, 0.0, 'n']
 
 
 def get_valid_float(prompt):
@@ -134,9 +142,9 @@ def save_water_data_in_file(daily_water_data, filename):
     output_file.close()
 
 
-def format_water_data_for_save(datetime_current_date, current_water_data, daily_water_data):
+def format_water_data_for_save(current_date, current_water_data, daily_water_data):
     latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-    if datetime_current_date != latest_water_data[DATE_INDEX]:
+    if current_date != latest_water_data[DATE_INDEX]:
         daily_water_data.append(current_water_data)
 
     # Sort data with latest date at top
