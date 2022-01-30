@@ -25,13 +25,12 @@ def main():
     # Use datetime.date objects within program
     current_date = datetime.date.today()
 
-    # Daily water data format: ['datetime.date(YYYY, MM, DD),0.0,n', 'datetime.datetime(YYYY, MM, DD),0.0,n']
+    # Daily water data format: [[datetime.date(YYYY, MM, DD),0.0,'n'], [datetime.date(YYYY, MM, DD),0.0,'n']]
     daily_water_data = get_daily_water_data(current_date)
-    print(daily_water_data)
+
     # Current water data format: ['datetime.date(YYYY, MM, DD)', '0.0', 'n']
-    current_water_data = get_current_water_data(daily_water_data)
-    print(daily_water_data)
-    print(current_water_data)
+    current_water_data = get_current_date_water_data(daily_water_data)
+
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
     print("Date:{}".format(current_date))
@@ -127,15 +126,9 @@ def get_daily_water_data(current_date):
         if current_date == latest_water_data[DATE_INDEX]:
             return daily_water_data
         else:
-            daily_water_data.append([current_date, 0.0, 'n'])
-
-            # Sort data with latest date at top
-            daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
+            add_current_date_water_data(daily_water_data, current_date)
             return daily_water_data
-    daily_water_data.append([current_date, 0.0, 'n'])
-
-    # Sort data with latest date at top
-    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
+    add_current_date_water_data(daily_water_data, current_date)
     return daily_water_data
 
 
@@ -147,7 +140,15 @@ def convert_date_str_to_date_obj(date_str):
     return datetime.date(year, month, day)
 
 
-def get_current_water_data(daily_water_data: list):
+def add_current_date_water_data(daily_water_data, current_date):
+    daily_water_data.append([current_date, 0.0, 'n'])
+
+    # Sort data with latest date at top
+    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
+    return daily_water_data
+
+
+def get_current_date_water_data(daily_water_data: list):
     latest_water_data = daily_water_data[LATEST_DATA_INDEX]
     return latest_water_data
 
