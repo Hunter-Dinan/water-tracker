@@ -65,12 +65,44 @@ def main():
             # get data from that week
         elif menu_input == "M":
             print("Monthly view")
-            month_dates_formatted = []
             month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
-            for week_dates in month_dates:
-                for day_date in week_dates:
-                    month_dates_formatted.append(day_date)
-            print(month_dates_formatted)
+            month_dates_individual = []
+            for week in month_dates:
+                for day in week:
+                    month_dates_individual.append(day)
+            # Sort dates so latest is at top, same as how data is saved
+            month_dates_individual.sort(reverse=True)
+            print(month_dates_individual)
+            # TODO: Check if there is data existing for these dates in daily_water_data
+            # TODO: Make a monthly_water_data array that stores the water data for each day of the month
+            # TODO: Populate that data with 0 when no data exists for that day in daily_water_data
+            # TODO: Print that data to output along with percent completed for the month and average daily intake
+            month_water_data = []
+            daily_water_data_dates = []
+
+            for water_data in daily_water_data:
+                daily_water_data_dates.append(water_data[DATE_INDEX])
+            print(daily_water_data_dates)
+
+            index = 0
+            for date in month_dates_individual:
+                if date in daily_water_data_dates:
+                    if daily_water_data[index][DATE_INDEX] == date:
+                        month_water_data.append(water_data)
+                        index += 1
+                    # for water_data in daily_water_data:
+                    #     if water_data[DATE_INDEX] == date:
+                    #         month_water_data.append(water_data)
+                    #         break
+                else:
+                    month_water_data.append([date, 0.0, 'n'])
+            print(month_water_data)
+            #     for water_data in daily_water_data:
+            #         if date == water_data[DATE_INDEX]:
+            #             month_water_data.append(water_data)
+            #             break
+            #   month_water_data.append([date, 0.0, 'n'])
+
         else:
             print("Invalid menu choice")
 
