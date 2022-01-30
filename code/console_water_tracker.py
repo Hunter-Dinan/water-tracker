@@ -112,7 +112,7 @@ def get_daily_water_data(current_date):
     for line in input_file:
         line = line.strip()
         water_data = line.split(',')
-        
+
         water_data[WATER_QUANTITY_INDEX] = float(water_data[WATER_QUANTITY_INDEX])
         date = water_data[DATE_INDEX]
         water_data[DATE_INDEX] = convert_date_str_to_date_obj(date)
@@ -127,8 +127,10 @@ def get_daily_water_data(current_date):
             return daily_water_data
         else:
             add_current_date_water_data(daily_water_data, current_date)
+            sort_daily_water_data_latest_date_first(daily_water_data)
             return daily_water_data
     add_current_date_water_data(daily_water_data, current_date)
+    sort_daily_water_data_latest_date_first(daily_water_data)
     return daily_water_data
 
 
@@ -142,15 +144,18 @@ def convert_date_str_to_date_obj(date_str):
 
 def add_current_date_water_data(daily_water_data, current_date):
     daily_water_data.append([current_date, 0.0, 'n'])
-
-    # Sort data with latest date at top
-    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
     return daily_water_data
 
 
 def get_current_date_water_data(daily_water_data: list):
     latest_water_data = daily_water_data[LATEST_DATA_INDEX]
     return latest_water_data
+
+
+def sort_daily_water_data_latest_date_first(daily_water_data):
+    # Sort data with latest date at top
+    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
+    return daily_water_data
 
 
 def mark_daily_water_completed(water_data):
