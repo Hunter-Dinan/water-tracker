@@ -26,11 +26,12 @@ def main():
     current_date = datetime.date.today()
 
     # Daily water data format: ['datetime.date(YYYY, MM, DD),0.0,n', 'datetime.datetime(YYYY, MM, DD),0.0,n']
-    daily_water_data = get_daily_water_data()
-
+    daily_water_data = get_daily_water_data(current_date)
+    print(daily_water_data)
     # Current water data format: ['datetime.date(YYYY, MM, DD)', '0.0', 'n']
-    current_water_data = get_current_water_data(current_date, daily_water_data)
-
+    current_water_data = get_current_water_data(daily_water_data)
+    print(daily_water_data)
+    print(current_water_data)
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
     print("Date:{}".format(current_date))
@@ -73,36 +74,27 @@ def main():
             # Sort dates so latest is at top, same as how data is saved
             month_dates_individual.sort(reverse=True)
             print(month_dates_individual)
-            # TODO: Check if there is data existing for these dates in daily_water_data
-            # TODO: Make a monthly_water_data array that stores the water data for each day of the month
-            # TODO: Populate that data with 0 when no data exists for that day in daily_water_data
-            # TODO: Print that data to output along with percent completed for the month and average daily intake
+
             month_water_data = []
             daily_water_data_dates = []
 
             for water_data in daily_water_data:
                 daily_water_data_dates.append(water_data[DATE_INDEX])
             print(daily_water_data_dates)
+            print(daily_water_data)
 
+            # Store data based on index of daily_water_data (manual iteration instead of for loop)
             index = 0
             for date in month_dates_individual:
                 if date in daily_water_data_dates:
                     if daily_water_data[index][DATE_INDEX] == date:
-                        month_water_data.append(water_data)
+                        month_water_data.append(daily_water_data[index])
                         index += 1
-                    # for water_data in daily_water_data:
-                    #     if water_data[DATE_INDEX] == date:
-                    #         month_water_data.append(water_data)
-                    #         break
                 else:
                     month_water_data.append([date, 0.0, 'n'])
-            print(month_water_data)
-            #     for water_data in daily_water_data:
-            #         if date == water_data[DATE_INDEX]:
-            #             month_water_data.append(water_data)
-            #             break
-            #   month_water_data.append([date, 0.0, 'n'])
 
+            # TODO: Print that data to output along with percent completed for the month and average daily intake
+            print(month_water_data)
         else:
             print("Invalid menu choice")
 
@@ -115,18 +107,7 @@ def main():
     print("Program terminated.")
 
 
-def get_water_quantity_litres(current_water_quantity, required_daily_water_quantity):
-    print("Enter quantity of water to add in litres:")
-    water_quantity = get_valid_float(">>> ")
-    return water_quantity
-
-
-def display_daily_water_intake_litres(current_water_quantity, required_daily_water_quantity):
-    print("Current daily water intake: {}L , Required daily water intake: {}L".format(
-        current_water_quantity, required_daily_water_quantity))
-
-
-def get_daily_water_data():
+def get_daily_water_data(current_date):
     daily_water_data = []
     input_file = open(WATER_DATA_FILE, "r")
     for line in input_file:
@@ -138,6 +119,23 @@ def get_daily_water_data():
         water_data[DATE_INDEX] = convert_date_str_to_date_obj(date)
 
         daily_water_data.append(water_data)
+    input_file.close()
+
+    # Add current date water data if it does not exist
+    if daily_water_data:
+        latest_water_data = daily_water_data[LATEST_DATA_INDEX]
+        if current_date == latest_water_data[DATE_INDEX]:
+            return daily_water_data
+        else:
+            daily_water_data.append([current_date, 0.0, 'n'])
+
+            # Sort data with latest date at top
+            daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
+            return daily_water_data
+    daily_water_data.append([current_date, 0.0, 'n'])
+
+    # Sort data with latest date at top
+    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
     return daily_water_data
 
 
@@ -149,12 +147,19 @@ def convert_date_str_to_date_obj(date_str):
     return datetime.date(year, month, day)
 
 
-def get_current_water_data(current_date, daily_water_data: list):
-    if daily_water_data:
-        latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-        if current_date == latest_water_data[DATE_INDEX]:
-            return latest_water_data
-    return [current_date, 0.0, 'n']
+def get_current_water_data(daily_water_data: list):
+    latest_water_data = daily_water_data[LATEST_DATA_INDEX]
+    return latest_water_data
+
+
+def mark_daily_water_completed(water_data):
+    water_data[COMPLETED_INDEX] = "y"
+    return water_data
+
+
+def update_current_water_data(current_water_quantity, current_water_data):
+    current_water_data[WATER_QUANTITY_INDEX] = current_water_quantity
+    return current_water_data
 
 
 def get_valid_float(prompt):
@@ -172,36 +177,30 @@ def get_valid_float(prompt):
     return float_number
 
 
-def save_water_data_in_file(daily_water_data, filename):
-    output_file = open(filename, "w")
-    for water_data in daily_water_data:
-        print("{},{},{}".format(water_data[DATE_INDEX], water_data[WATER_QUANTITY_INDEX],
-                                water_data[COMPLETED_INDEX]), file=output_file)
-    output_file.close()
+def get_water_quantity_litres(current_water_quantity, required_daily_water_quantity):
+    print("Enter quantity of water to add in litres:")
+    water_quantity = get_valid_float(">>> ")
+    return water_quantity
 
 
-def format_water_data_for_save(current_date, current_water_data, daily_water_data):
-    latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-    if current_date != latest_water_data[DATE_INDEX]:
-        daily_water_data.append(current_water_data)
+def display_daily_water_intake_litres(current_water_quantity, required_daily_water_quantity):
+    print("Current daily water intake: {}L , Required daily water intake: {}L".format(
+        current_water_quantity, required_daily_water_quantity))
 
-    # Sort data with latest date at top
-    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
 
+def format_water_data_for_save(daily_water_data):
     # Convert datetime.date obj to string: YYYY-MM-DD
     for water_data in daily_water_data:
         water_data[DATE_INDEX] = str(water_data[DATE_INDEX])
     return daily_water_data
 
 
-def mark_daily_water_completed(water_data):
-    water_data[COMPLETED_INDEX] = "y"
-    return water_data
-
-
-def update_current_water_data(current_water_quantity, current_water_data):
-    current_water_data[WATER_QUANTITY_INDEX] = current_water_quantity
-    return current_water_data
+def save_water_data_in_file(daily_water_data, filename):
+    output_file = open(filename, "w")
+    for water_data in daily_water_data:
+        print("{},{},{}".format(water_data[DATE_INDEX], water_data[WATER_QUANTITY_INDEX],
+                                water_data[COMPLETED_INDEX]), file=output_file)
+    output_file.close()
 
 
 if __name__ == '__main__':
