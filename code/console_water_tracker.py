@@ -1,6 +1,7 @@
 import datetime
 import calendar
 from operator import itemgetter
+from dateutil.relativedelta import relativedelta
 
 MENU = """Console Water Tracker Menu
 (A)dd water
@@ -66,22 +67,22 @@ def main():
         elif menu_input == "M":
             print("Monthly view")
 
-            # TODO: Select which month
-            selected_month_date = ''
-            print("Selected month is: {}/{}".format(current_date.month, current_date.year))
+            selected_month_date = current_date
+            print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
             print("Press > to go forward, Press < to go backward, Press Return or Enter to "
                   "choose the selected month")
             month_menu_input = input(">>> ")
             while month_menu_input != "":
                 if month_menu_input == ">":
-                    print("forward")
+                    selected_month_date += relativedelta(months=+1)
                 elif month_menu_input == "<":
-                    print("backward")
+                    selected_month_date += relativedelta(months=-1)
                 else:
                     print("Invalid menu choice")
+                print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
                 month_menu_input = input(">>> ")
 
-            month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
+            month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
             month_dates_individual = get_month_dates_individual(month_dates)
             daily_water_data_dates = get_daily_water_data_dates(daily_water_data)
             month_water_data = get_month_water_data(month_dates_individual, daily_water_data_dates,
