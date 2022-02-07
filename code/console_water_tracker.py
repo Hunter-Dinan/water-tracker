@@ -9,6 +9,9 @@ MENU = """Console Water Tracker Menu
 (W)eekly view
 (M)onthly view
 (Q)uit"""
+MONTH_SELECTOR_MENU = """Press > to go forward
+Press < to go backward
+Press Return or Enter to choose the selected month"""
 WATER_DATA_FILE = "daily_water_save.csv"
 REQUIRED_DAILY_WATER_QUANTITY_LITRES = 3.5
 LATEST_DATA_INDEX = 0
@@ -67,10 +70,10 @@ def main():
         elif menu_input == "M":
             print("Monthly view")
 
-            selected_month_date = current_date
+            # Set selected month date to the first day of the chosen month
+            selected_month_date = current_date.replace(day=1)
             print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
-            print("Press > to go forward, Press < to go backward, Press Return or Enter to "
-                  "choose the selected month")
+            print(MONTH_SELECTOR_MENU)
             month_menu_input = input(">>> ")
             while month_menu_input != "":
                 if month_menu_input == ">":
@@ -80,16 +83,25 @@ def main():
                 else:
                     print("Invalid menu choice")
                 print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
+                print(MONTH_SELECTOR_MENU)
                 month_menu_input = input(">>> ")
 
             month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
             month_dates_individual = get_month_dates_individual(month_dates)
-            daily_water_data_dates = get_daily_water_data_dates(daily_water_data)
-            month_water_data = get_month_water_data(month_dates_individual, daily_water_data_dates,
-                                                    daily_water_data)
 
-            # TODO: Print that data to output along with percent completed for the month and average daily intake
-            # TODO: Make a display_monthly_view function with monthly_water_data as input for ^^^
+            month_water_data = []
+            for date in month_dates_individual:
+                for water_data in daily_water_data:
+
+                    if date > water_data[DATE_INDEX]:
+                        month_water_data.append([date, 0.0, 'n'])
+                        break
+                    elif date == water_data[DATE_INDEX]:
+                        month_water_data.append(water_data)
+                        break
+                    # If last entry in save data but not at the selected date yet, set 0
+                    elif water_data is daily_water_data[-1]:
+                        month_water_data.append([date, 0.0, 'n'])
             print(month_water_data)
         else:
             print("Invalid menu choice")
