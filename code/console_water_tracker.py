@@ -87,8 +87,8 @@ def main():
                 month_menu_input = input(">>> ")
 
             month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
-            month_dates_individual = get_month_dates_individual(month_dates)
-
+            month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
+            print(month_dates_individual)
             month_water_data = []
             for date in month_dates_individual:
                 for water_data in daily_water_data:
@@ -167,11 +167,12 @@ def sort_daily_water_data_latest_date_first(daily_water_data):
     return daily_water_data
 
 
-def get_month_dates_individual(month_dates):
+def get_month_dates_individual(month_dates, selected_month):
     month_dates_individual = []
     for week in month_dates:
         for day in week:
-            month_dates_individual.append(day)
+            if day.month == selected_month:
+                month_dates_individual.append(day)
     # Sort dates so latest is at top, same as how data is saved
     month_dates_individual.sort(reverse=True)
     return month_dates_individual
