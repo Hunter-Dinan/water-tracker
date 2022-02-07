@@ -177,27 +177,6 @@ def get_month_dates_individual(month_dates):
     return month_dates_individual
 
 
-def get_daily_water_data_dates(daily_water_data):
-    daily_water_data_dates = []
-    for water_data in daily_water_data:
-        daily_water_data_dates.append(water_data[DATE_INDEX])
-    return daily_water_data_dates
-
-
-def get_month_water_data(month_dates_individual, daily_water_data_dates, daily_water_data):
-    month_water_data = []
-    # Store data based on index of daily_water_data (manual iteration instead of for loop)
-    index = 0
-    for date in month_dates_individual:
-        if date in daily_water_data_dates:
-            if daily_water_data[index][DATE_INDEX] == date:
-                month_water_data.append(daily_water_data[index])
-                index += 1
-        else:
-            month_water_data.append([date, 0.0, 'n'])
-    return month_water_data
-
-
 def mark_daily_water_completed(water_data):
     water_data[COMPLETED_INDEX] = "y"
     return water_data
