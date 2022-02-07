@@ -88,20 +88,9 @@ def main():
 
             month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
             month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
-            print(month_dates_individual)
-            month_water_data = []
-            for date in month_dates_individual:
-                for water_data in daily_water_data:
+            month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
 
-                    if date > water_data[DATE_INDEX]:
-                        month_water_data.append([date, 0.0, 'n'])
-                        break
-                    elif date == water_data[DATE_INDEX]:
-                        month_water_data.append(water_data)
-                        break
-                    # If last entry in save data but not at the selected date yet, set 0
-                    elif water_data is daily_water_data[-1]:
-                        month_water_data.append([date, 0.0, 'n'])
+            # TODO: Display monthly data and statistics
             print(month_water_data)
         else:
             print("Invalid menu choice")
@@ -176,6 +165,23 @@ def get_month_dates_individual(month_dates, selected_month):
     # Sort dates so latest is at top, same as how data is saved
     month_dates_individual.sort(reverse=True)
     return month_dates_individual
+
+
+def get_month_water_data(month_dates_individual, daily_water_data):
+    month_water_data = []
+    for date in month_dates_individual:
+        for water_data in daily_water_data:
+
+            if date > water_data[DATE_INDEX]:
+                month_water_data.append([date, 0.0, 'n'])
+                break
+            elif date == water_data[DATE_INDEX]:
+                month_water_data.append(water_data)
+                break
+            # If last entry in save data but not at the selected date yet, set to 0
+            elif water_data is daily_water_data[-1]:
+                month_water_data.append([date, 0.0, 'n'])
+    return month_water_data
 
 
 def mark_daily_water_completed(water_data):
