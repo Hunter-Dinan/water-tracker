@@ -135,7 +135,30 @@ def main():
             month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
 
             # TODO: Display monthly data and statistics
-            print(month_water_data)
+            # TODO: Display monthly avg water intake
+            # TODO: Display monthly avg completed
+            # TODO: Only do calculations up to the current date, ignore future dates in the month
+
+            # Calculate average water intake over the month (Does not count the days after current date)
+            total_monthly_water_consumed = 0
+            total_days = 0
+            total_days_completed = 0
+            for water_data in month_water_data:
+                if current_date < water_data[DATE_INDEX]:
+                    break
+                total_monthly_water_consumed += water_data[WATER_QUANTITY_INDEX]
+                total_days += 1
+
+                if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+                    total_days_completed += 1
+
+            if total_days != 0:
+                average_month_water_intake = total_monthly_water_consumed/total_days
+                days_completed_percent = (total_days_completed/total_days)*100
+                print("Average monthly water intake: {:.2f}L".format(average_month_water_intake))
+                print("Percent days completed: {:.2f}%".format(days_completed_percent))
+            else:
+                print("There is no recorded data for this month")
         else:
             print("Invalid menu choice")
 
