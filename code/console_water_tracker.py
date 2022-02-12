@@ -100,23 +100,9 @@ def main():
                 print("Selected week is: {}".format(selected_week))
                 print(WEEK_SELECTOR_MENU)
                 week_menu_input = input(">>> ")
+            week_water_data = get_week_water_data(selected_week, daily_water_data)
 
-            # TODO: Get weekly water data
-            week_water_data = []
-            for date in selected_week:
-                for water_data in daily_water_data:
-                    # If date is older than current water_data date then there is no data, set to 0
-                    if date > water_data[DATE_INDEX]:
-                        week_water_data.append([date, 0.0, 'n'])
-                        break
-                    elif date == water_data[DATE_INDEX]:
-                        week_water_data.append(water_data)
-                        break
-                    # If last entry in save data but not at the selected date yet, set to 0
-                    elif water_data is daily_water_data[-1]:
-                        week_water_data.append([date, 0.0, 'n'])
-
-            # TODO: Display monthly data and statistics
+            # TODO: Display weekly data and statistics
             print(week_water_data)
         elif menu_input == "M":
             print("Monthly view")
@@ -223,6 +209,23 @@ def get_previous_month_date(current_date):
     selected_month_date = current_date.replace(day=1)
     selected_month_date += relativedelta(months=-1)
     return selected_month_date
+
+
+def get_week_water_data(selected_week, daily_water_data):
+    week_water_data = []
+    for date in selected_week:
+        for water_data in daily_water_data:
+            # If date is older than current water_data date then there is no data, set to 0
+            if date > water_data[DATE_INDEX]:
+                week_water_data.append([date, 0.0, 'n'])
+                break
+            elif date == water_data[DATE_INDEX]:
+                week_water_data.append(water_data)
+                break
+            # If last entry in save data but not at the selected date yet, set to 0
+            elif water_data is daily_water_data[-1]:
+                week_water_data.append([date, 0.0, 'n'])
+    return week_water_data
 
 
 def get_month_dates_individual(month_dates, selected_month):
