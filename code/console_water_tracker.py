@@ -65,37 +65,32 @@ def main():
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
         elif menu_input == "W":
             print("Weekly view")
-
             month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
-            # Select current week
-            for week_index, week in enumerate(month_dates):
-                for day in week:
-                    if current_date == day:
-                        selected_week = week
-                        selected_week_index = week_index
+            selected_week_index = get_current_week_index(month_dates, current_date)
+            selected_week = month_dates[selected_week_index]
 
             print("Selected week is: {}".format(selected_week)) # TODO: Fix string repr of selected_week
             print(WEEK_SELECTOR_MENU)
             week_menu_input = input(">>> ")
             while week_menu_input != "":
                 if week_menu_input == ">":
-                    if selected_week_index < 3:
+                    if selected_week_index < END_OF_MONTH_INDEX:
                         selected_week_index += 1
                         selected_week = month_dates[selected_week_index]
                     else:
-                        selected_month_date = current_date.replace(day=1)
-                        selected_month_date += relativedelta(months=+1)
+                        # Move selection to start of next month
+                        selected_month_date = get_next_month_date(current_date)
                         month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
                                                                         selected_month_date.month)
                         selected_week_index = START_OF_MONTH_INDEX
                         selected_week = month_dates[selected_week_index]
                 elif week_menu_input == "<":
-                    if selected_week_index > 0:
+                    if selected_week_index > START_OF_MONTH_INDEX:
                         selected_week_index -= 1
                         selected_week = month_dates[selected_week_index]
                     else:
-                        selected_month_date = current_date.replace(day=1)
-                        selected_month_date += relativedelta(months=-1)
+                        # Move selection to end of next month
+                        selected_month_date = get_previous_month_date(current_date)
                         month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
                                                                         selected_month_date.month)
                         selected_week_index = END_OF_MONTH_INDEX
@@ -208,6 +203,26 @@ def sort_daily_water_data_latest_date_first(daily_water_data):
     # Sort data with latest date at top
     daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
     return daily_water_data
+
+
+def get_current_week_index(month_dates, current_date):
+    for week_index, week in enumerate(month_dates):
+        for day in week:
+            if current_date == day:
+                current_week_index = week_index
+    return current_week_index
+
+
+def get_next_month_date(current_date):
+    selected_month_date = current_date.replace(day=1)
+    selected_month_date += relativedelta(months=+1)
+    return selected_month_date
+
+
+def get_previous_month_date(current_date):
+    selected_month_date = current_date.replace(day=1)
+    selected_month_date += relativedelta(months=-1)
+    return selected_month_date
 
 
 def get_month_dates_individual(month_dates, selected_month):
