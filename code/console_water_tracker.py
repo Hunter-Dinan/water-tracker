@@ -25,6 +25,9 @@ WATER_QUANTITY_INDEX = 1
 COMPLETED_INDEX = 2
 END_OF_DATE_INDEX = 10
 COMPLETED_CHARACTER = 'y'
+START_OF_WEEK_INDEX = 0
+END_OF_WEEK_INDEX = -1
+LAST_ENTRY_INDEX = -1
 
 
 def main():
@@ -41,6 +44,10 @@ def main():
     # Current water data format: ['datetime.date(YYYY, MM, DD)', '0.0', 'n']
     current_water_data = get_current_date_water_data(daily_water_data)
 
+    # NOTE(Hunter): Variable for current water quantity is a copy of the list value but is independent
+    # from the actual value and must be updated separately, this could be problematic if used incorrectly
+    # but it improves readability of the code. Ideally a pointer would be used but Python does not have
+    # pointers
     current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
 
     print("Date:{}".format(current_date))
@@ -68,8 +75,9 @@ def main():
             month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
             selected_week_index = get_current_week_index(month_dates, current_date)
             selected_week = month_dates[selected_week_index]
+            selected_week_str = get_selected_week_string_format(selected_week)
 
-            print("Selected week is: {}".format(selected_week)) # TODO: Fix string repr of selected_week
+            print("Selected week is: {}".format(selected_week_str))
             print(WEEK_SELECTOR_MENU)
             week_menu_input = input(">>> ")
             while week_menu_input != "":
@@ -97,7 +105,8 @@ def main():
                         selected_week = month_dates[selected_week_index]
                 else:
                     print("Invalid menu choice")
-                print("Selected week is: {}".format(selected_week))
+                selected_week_str = get_selected_week_string_format(selected_week)
+                print("Selected week is: {}".format(selected_week_str))
                 print(WEEK_SELECTOR_MENU)
                 week_menu_input = input(">>> ")
             week_water_data = get_week_water_data(selected_week, daily_water_data)
@@ -191,6 +200,15 @@ def sort_daily_water_data_latest_date_first(daily_water_data):
     return daily_water_data
 
 
+def get_selected_week_string_format(selected_week):
+    # selected_week_str format: DD/MM - DD/MM
+    first_day = selected_week[START_OF_WEEK_INDEX]
+    last_day = selected_week[END_OF_WEEK_INDEX]
+    selected_week_str = "{}/{} - {}/{}".format(first_day.day, first_day.month, last_day.day,
+                                               last_day.month)
+    return selected_week_str
+
+
 def get_current_week_index(month_dates, current_date):
     for week_index, week in enumerate(month_dates):
         for day in week:
@@ -223,7 +241,7 @@ def get_week_water_data(selected_week, daily_water_data):
                 week_water_data.append(water_data)
                 break
             # If last entry in save data but not at the selected date yet, set to 0
-            elif water_data is daily_water_data[-1]:
+            elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
                 week_water_data.append([date, 0.0, 'n'])
     return week_water_data
 
@@ -252,7 +270,7 @@ def get_month_water_data(month_dates_individual, daily_water_data):
                 month_water_data.append(water_data)
                 break
             # If last entry in save data but not at the selected date yet, set to 0
-            elif water_data is daily_water_data[-1]:
+            elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
                 month_water_data.append([date, 0.0, 'n'])
     return month_water_data
 
