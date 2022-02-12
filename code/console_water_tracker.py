@@ -3,12 +3,14 @@ import calendar
 from operator import itemgetter
 from dateutil.relativedelta import relativedelta
 
-MENU = """Console Water Tracker Menu
+MENU = """---------------------------------
+Console Water Tracker Menu
 (A)dd water
 (D)aily view
 (W)eekly view
 (M)onthly view
-(Q)uit"""
+(Q)uit
+---------------------------------"""
 MONTH_SELECTOR_MENU = """Press > to go forward
 Press < to go backward
 Press Return or Enter to choose the selected month"""
@@ -112,7 +114,41 @@ def main():
             week_water_data = get_week_water_data(selected_week, daily_water_data)
 
             # TODO: Display weekly data and statistics
-            print(week_water_data)
+            # TODO: Display individual daily data
+            # TODO: Display weekly avg water intake
+            # TODO: Display weekly avg completed
+            # TODO: Only do calculations up to the current date, ignore future dates in the month
+
+            # Calculate average water intake over the week (Does not count the days after current date)
+            total_weekly_water_consumed = 0
+            total_days = 0
+            total_days_completed = 0
+            for water_data in week_water_data:
+                if current_date < water_data[DATE_INDEX]:
+                    break
+
+                if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+                    completed_str = "Yes"
+                else:
+                    completed_str = "No"
+                print("Date: {}/{}, Water intake: {:.2f}L, Completed: {}".format(water_data[DATE_INDEX].day,
+                                                                                 water_data[DATE_INDEX].month,
+                                                                                 water_data[WATER_QUANTITY_INDEX],
+                                                                                 completed_str))
+
+                total_weekly_water_consumed += water_data[WATER_QUANTITY_INDEX]
+                total_days += 1
+
+                if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+                    total_days_completed += 1
+
+            if total_days != 0:
+                average_week_water_intake = total_weekly_water_consumed / total_days
+                days_completed_percent = (total_days_completed / total_days) * 100
+                print("Average weekly water intake: {:.2f}L".format(average_week_water_intake))
+                print("Percent days completed: {:.2f}%".format(days_completed_percent))
+            else:
+                print("There is no recorded data for this week")
         elif menu_input == "M":
             print("Monthly view")
             # Set selected month date to the first day of the chosen month
