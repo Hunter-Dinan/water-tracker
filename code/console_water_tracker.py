@@ -71,42 +71,56 @@ def main():
             for week_index, week in enumerate(month_dates):
                 for day in week:
                     if current_date == day:
-                        current_week = week
-                        current_week_index = week_index
+                        selected_week = week
+                        selected_week_index = week_index
 
-            print("Selected week is: {}".format(current_week)) # TODO: Fix string repr of current_week
+            print("Selected week is: {}".format(selected_week)) # TODO: Fix string repr of selected_week
             print(WEEK_SELECTOR_MENU)
             week_menu_input = input(">>> ")
             while week_menu_input != "":
                 if week_menu_input == ">":
-                    if current_week_index < 3:
-                        current_week_index += 1
-                        current_week = month_dates[current_week_index]
+                    if selected_week_index < 3:
+                        selected_week_index += 1
+                        selected_week = month_dates[selected_week_index]
                     else:
                         selected_month_date = current_date.replace(day=1)
                         selected_month_date += relativedelta(months=+1)
                         month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
                                                                         selected_month_date.month)
-                        current_week_index = START_OF_MONTH_INDEX
-                        current_week = month_dates[current_week_index]
+                        selected_week_index = START_OF_MONTH_INDEX
+                        selected_week = month_dates[selected_week_index]
                 elif week_menu_input == "<":
-                    if current_week_index > 0:
-                        current_week_index -= 1
-                        current_week = month_dates[current_week_index]
+                    if selected_week_index > 0:
+                        selected_week_index -= 1
+                        selected_week = month_dates[selected_week_index]
                     else:
                         selected_month_date = current_date.replace(day=1)
                         selected_month_date += relativedelta(months=-1)
                         month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
                                                                         selected_month_date.month)
-                        current_week_index = END_OF_MONTH_INDEX
-                        current_week = month_dates[current_week_index]
+                        selected_week_index = END_OF_MONTH_INDEX
+                        selected_week = month_dates[selected_week_index]
                 else:
                     print("Invalid menu choice")
-                print("Selected week is: {}".format(current_week))
+                print("Selected week is: {}".format(selected_week))
                 print(WEEK_SELECTOR_MENU)
                 week_menu_input = input(">>> ")
 
             # TODO: Get weekly water data
+            # week_water_data = []
+            # for day in selected_week:
+            #     for water_data in daily_water_data:
+            #         # If date is older than current water_data date then there is no data, set to 0
+            #         if date > water_data[DATE_INDEX]:
+            #             month_water_data.append([date, 0.0, 'n'])
+            #             break
+            #         elif date == water_data[DATE_INDEX]:
+            #             month_water_data.append(water_data)
+            #             break
+            #         # If last entry in save data but not at the selected date yet, set to 0
+            #         elif water_data is daily_water_data[-1]:
+            #             month_water_data.append([date, 0.0, 'n'])
+
             # TODO: Display monthly data and statistics
 
         elif menu_input == "M":
