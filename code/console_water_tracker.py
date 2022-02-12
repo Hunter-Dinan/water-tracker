@@ -12,7 +12,12 @@ MENU = """Console Water Tracker Menu
 MONTH_SELECTOR_MENU = """Press > to go forward
 Press < to go backward
 Press Return or Enter to choose the selected month"""
+WEEK_SELECTOR_MENU = """Press > to go forward
+Press < to go backward
+Press Return or Enter to choose the selected week"""
 WATER_DATA_FILE = "daily_water_save.csv"
+START_OF_MONTH_INDEX = 0
+END_OF_MONTH_INDEX = 3
 REQUIRED_DAILY_WATER_QUANTITY_LITRES = 3.5
 LATEST_DATA_INDEX = 0
 DATE_INDEX = 0
@@ -23,9 +28,10 @@ COMPLETED_CHARACTER = 'y'
 
 
 def main():
+    # Initial date format in save file: YYYY-MM-DD
+
     calendar_dates = calendar.Calendar()
 
-    # Initial date format in save file: YYYY-MM-DD
     # Use datetime.date objects within program
     current_date = datetime.date.today()
 
@@ -59,17 +65,52 @@ def main():
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
         elif menu_input == "W":
             print("Weekly view")
+
             month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
-            for week_dates in month_dates:
-                for day_date in week_dates:
-                    if current_date == day_date:
-                        current_week = week_dates
-                        print(current_week)
-            # find out which week it is
-            # get data from that week
+            # Select current week
+            for week_index, week in enumerate(month_dates):
+                for day in week:
+                    if current_date == day:
+                        current_week = week
+                        current_week_index = week_index
+
+            print("Selected week is: {}".format(current_week)) # TODO: Fix string repr of current_week
+            print(WEEK_SELECTOR_MENU)
+            week_menu_input = input(">>> ")
+            while week_menu_input != "":
+                if week_menu_input == ">":
+                    if current_week_index < 3:
+                        current_week_index += 1
+                        current_week = month_dates[current_week_index]
+                    else:
+                        selected_month_date = current_date.replace(day=1)
+                        selected_month_date += relativedelta(months=+1)
+                        month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
+                                                                        selected_month_date.month)
+                        current_week_index = START_OF_MONTH_INDEX
+                        current_week = month_dates[current_week_index]
+                elif week_menu_input == "<":
+                    if current_week_index > 0:
+                        current_week_index -= 1
+                        current_week = month_dates[current_week_index]
+                    else:
+                        selected_month_date = current_date.replace(day=1)
+                        selected_month_date += relativedelta(months=-1)
+                        month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
+                                                                        selected_month_date.month)
+                        current_week_index = END_OF_MONTH_INDEX
+                        current_week = month_dates[current_week_index]
+                else:
+                    print("Invalid menu choice")
+                print("Selected week is: {}".format(current_week))
+                print(WEEK_SELECTOR_MENU)
+                week_menu_input = input(">>> ")
+
+            # TODO: Get weekly water data
+            # TODO: Display monthly data and statistics
+
         elif menu_input == "M":
             print("Monthly view")
-
             # Set selected month date to the first day of the chosen month
             selected_month_date = current_date.replace(day=1)
             print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
@@ -85,7 +126,6 @@ def main():
                 print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
                 print(MONTH_SELECTOR_MENU)
                 month_menu_input = input(">>> ")
-
             month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
             month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
             month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
@@ -160,6 +200,7 @@ def get_month_dates_individual(month_dates, selected_month):
     month_dates_individual = []
     for week in month_dates:
         for day in week:
+            # Months include days before and after that month
             if day.month == selected_month:
                 month_dates_individual.append(day)
     # Sort dates so latest is at top, same as how data is saved
@@ -171,7 +212,7 @@ def get_month_water_data(month_dates_individual, daily_water_data):
     month_water_data = []
     for date in month_dates_individual:
         for water_data in daily_water_data:
-
+            # If date is older than current water_data date then there is no data, set to 0
             if date > water_data[DATE_INDEX]:
                 month_water_data.append([date, 0.0, 'n'])
                 break
