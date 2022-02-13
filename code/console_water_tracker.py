@@ -99,7 +99,7 @@ def main():
                         selected_week_index -= 1
                         selected_week = month_dates[selected_week_index]
                     else:
-                        # Move selection to end of next month
+                        # Move selection to end of previous month
                         selected_month_date = get_previous_month_date(current_date)
                         month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
                                                                         selected_month_date.month)
@@ -112,43 +112,7 @@ def main():
                 print(WEEK_SELECTOR_MENU)
                 week_menu_input = input(">>> ")
             week_water_data = get_week_water_data(selected_week, daily_water_data)
-
-            # TODO: Display weekly data and statistics
-            # TODO: Display individual daily data
-            # TODO: Display weekly avg water intake
-            # TODO: Display weekly avg completed
-            # TODO: Only do calculations up to the current date, ignore future dates in the month
-
-            # Calculate average water intake over the week (Does not count the days after current date)
-            total_weekly_water_consumed = 0
-            total_days = 0
-            total_days_completed = 0
-            for water_data in week_water_data:
-                if current_date < water_data[DATE_INDEX]:
-                    break
-
-                if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-                    completed_str = "Yes"
-                else:
-                    completed_str = "No"
-                print("Date: {}/{}, Water intake: {:.2f}L, Completed: {}".format(water_data[DATE_INDEX].day,
-                                                                                 water_data[DATE_INDEX].month,
-                                                                                 water_data[WATER_QUANTITY_INDEX],
-                                                                                 completed_str))
-
-                total_weekly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-                total_days += 1
-
-                if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-                    total_days_completed += 1
-
-            if total_days != 0:
-                average_week_water_intake = total_weekly_water_consumed / total_days
-                days_completed_percent = (total_days_completed / total_days) * 100
-                print("Average weekly water intake: {:.2f}L".format(average_week_water_intake))
-                print("Percent days completed: {:.2f}%".format(days_completed_percent))
-            else:
-                print("There is no recorded data for this week")
+            display_week_water_data(week_water_data, current_date)
         elif menu_input == "M":
             print("Monthly view")
             # Set selected month date to the first day of the chosen month
@@ -169,32 +133,7 @@ def main():
             month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
             month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
             month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
-
-            # TODO: Display monthly data and statistics
-            # TODO: Display monthly avg water intake
-            # TODO: Display monthly avg completed
-            # TODO: Only do calculations up to the current date, ignore future dates in the month
-
-            # Calculate average water intake over the month (Does not count the days after current date)
-            total_monthly_water_consumed = 0
-            total_days = 0
-            total_days_completed = 0
-            for water_data in month_water_data:
-                if current_date < water_data[DATE_INDEX]:
-                    break
-                total_monthly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-                total_days += 1
-
-                if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-                    total_days_completed += 1
-
-            if total_days != 0:
-                average_month_water_intake = total_monthly_water_consumed/total_days
-                days_completed_percent = (total_days_completed/total_days)*100
-                print("Average monthly water intake: {:.2f}L".format(average_month_water_intake))
-                print("Percent days completed: {:.2f}%".format(days_completed_percent))
-            else:
-                print("There is no recorded data for this month")
+            display_month_water_data(month_water_data, current_date)
         else:
             print("Invalid menu choice")
 
@@ -305,6 +244,42 @@ def get_week_water_data(selected_week, daily_water_data):
     return week_water_data
 
 
+def display_week_water_data(week_water_data, current_date):
+    # Calculate average water intake over the week (Does not count the days after current date)
+    total_weekly_water_consumed = 0
+    total_days = 0
+    total_days_completed = 0
+    for water_data in week_water_data:
+        if current_date < water_data[DATE_INDEX]:
+            break
+        completed_str = get_completed_string_display_format(water_data)
+        print("Date: {}/{}, Water intake: {:.2f}L, Completed: {}".format(water_data[DATE_INDEX].day,
+                                                                         water_data[DATE_INDEX].month,
+                                                                         water_data[WATER_QUANTITY_INDEX],
+                                                                         completed_str))
+
+        total_weekly_water_consumed += water_data[WATER_QUANTITY_INDEX]
+        total_days += 1
+        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+            total_days_completed += 1
+
+    if total_days != 0:
+        average_week_water_intake = total_weekly_water_consumed / total_days
+        days_completed_percent = (total_days_completed / total_days) * 100
+        print("Average weekly water intake: {:.2f}L".format(average_week_water_intake))
+        print("Percent days completed: {:.2f}%".format(days_completed_percent))
+    else:
+        print("There is no recorded data for this week")
+
+
+def get_completed_string_display_format(water_data):
+    if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+        completed_str = "Yes"
+    else:
+        completed_str = "No"
+    return completed_str
+
+
 def get_month_dates_individual(month_dates, selected_month):
     month_dates_individual = []
     for week in month_dates:
@@ -332,6 +307,29 @@ def get_month_water_data(month_dates_individual, daily_water_data):
             elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
                 month_water_data.append([date, 0.0, 'n'])
     return month_water_data
+
+
+def display_month_water_data(month_water_data, current_date):
+    # Calculate average water intake over the month (Does not count the days after current date)
+    total_monthly_water_consumed = 0
+    total_days = 0
+    total_days_completed = 0
+    for water_data in month_water_data:
+        if current_date < water_data[DATE_INDEX]:
+            break
+        total_monthly_water_consumed += water_data[WATER_QUANTITY_INDEX]
+        total_days += 1
+
+        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+            total_days_completed += 1
+
+    if total_days != 0:
+        average_month_water_intake = total_monthly_water_consumed / total_days
+        days_completed_percent = (total_days_completed / total_days) * 100
+        print("Average monthly water intake: {:.2f}L".format(average_month_water_intake))
+        print("Percent days completed: {:.2f}%".format(days_completed_percent))
+    else:
+        print("There is no recorded data for this month")
 
 
 def mark_daily_water_completed(water_data):
