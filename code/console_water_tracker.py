@@ -9,6 +9,7 @@ Console Water Tracker Menu
 (D)aily view
 (W)eekly view
 (M)onthly view
+(Y)early view
 (Q)uit
 ---------------------------------"""
 MONTH_SELECTOR_MENU = """Press > to go forward
@@ -134,6 +135,18 @@ def main():
             month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
             month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
             display_month_water_data(month_water_data, current_date)
+        elif menu_input == "Y":
+            print("Yearly View")
+            year_dates = calendar_dates.yeardatescalendar(2022, 1)
+            year_dates_individual = []
+            for year in year_dates:
+                for month in year:
+                    for week in month:
+                        for day in week:
+                            if day.year == 2022:
+                                year_dates_individual.append(day)
+                                year_dates_individual.sort(reverse=True)
+            print(year_dates_individual)
         else:
             print("Invalid menu choice")
 
