@@ -45,6 +45,7 @@ def main():
     current_date = datetime.date.today()
 
     # Daily water data format: [[datetime.date(YYYY, MM, DD),0.0,'n'], [datetime.date(YYYY, MM, DD),0.0,'n']]
+    # Daily water data is sorted in descending order by date (latest date is first)
     daily_water_data = get_daily_water_data(current_date)
 
     # Current water data format: ['datetime.date(YYYY, MM, DD)', '0.0', 'n']
@@ -115,7 +116,10 @@ def main():
                 print("Selected week is: {}".format(selected_week_str))
                 print(WEEK_SELECTOR_MENU)
                 week_menu_input = input(">>> ")
+            selected_week.sort(reverse=True)
             week_water_data = get_week_water_data(selected_week, daily_water_data)
+            # TODO: Change week water data to ascending order
+            week_water_data.sort(key=itemgetter(DATE_INDEX))
             display_week_water_data(week_water_data, current_date)
         elif menu_input == "M":
             print("Monthly view")
@@ -137,6 +141,8 @@ def main():
             month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
             month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
             month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
+            # TODO: Change month water data to ascending order
+            month_water_data.sort(key=itemgetter(DATE_INDEX))
             display_month_water_data(month_water_data, current_date)
         elif menu_input == "Y":
             print("Yearly View")
@@ -164,7 +170,7 @@ def main():
                     for day in week:
                         if day.year == selected_year_date.year:
                             year_dates_individual.append(day)
-                            year_dates_individual.sort(reverse=True)
+            year_dates_individual.sort(reverse=True)
 
             # TODO: Get yearly water data
             year_water_data = []
@@ -180,6 +186,9 @@ def main():
                     # If last entry in save data but not at the selected date yet, set to 0
                     elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
                         year_water_data.append([date, 0.0, 'n'])
+
+            # TODO: Change year water data to ascending order
+            year_water_data.sort(key=itemgetter(DATE_INDEX))
 
             # TODO: Display average yearly water intake
             # Calculate average water intake over the year (Does not count the days after current date)
