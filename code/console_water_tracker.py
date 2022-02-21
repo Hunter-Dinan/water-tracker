@@ -84,6 +84,8 @@ def main():
             selected_week = month_dates[selected_week_index]
             selected_week_str = get_selected_week_string_format(selected_week)
 
+            selected_month_date = current_date.replace(day=1)
+
             print("Selected week is: {}".format(selected_week_str))
             print(WEEK_SELECTOR_MENU)
             week_menu_input = input(">>> ")
@@ -94,7 +96,7 @@ def main():
                         selected_week = month_dates[selected_week_index]
                     else:
                         # Move selection to start of next month
-                        selected_month_date = get_next_month_date(current_date)
+                        selected_month_date = get_next_month_date(selected_month_date)
                         month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
                                                                         selected_month_date.month)
                         selected_week_index = START_OF_MONTH_INDEX
@@ -105,7 +107,7 @@ def main():
                         selected_week = month_dates[selected_week_index]
                     else:
                         # Move selection to end of previous month
-                        selected_month_date = get_previous_month_date(current_date)
+                        selected_month_date = get_previous_month_date(selected_month_date)
                         month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
                                                                         selected_month_date.month)
                         selected_week_index = END_OF_MONTH_INDEX
@@ -292,15 +294,21 @@ def get_current_week_index(month_dates, current_date):
     return current_week_index
 
 
-def get_next_month_date(current_date):
-    selected_month_date = current_date.replace(day=1)
-    selected_month_date += relativedelta(months=+1)
+def get_next_month_date(selected_month_date):
+    if selected_month_date.month < 12:
+        selected_month_date += relativedelta(months=+1)
+    else:
+        selected_month_date = selected_month_date.replace(month=1)
+        selected_month_date += relativedelta(year=+1)
     return selected_month_date
 
 
-def get_previous_month_date(current_date):
-    selected_month_date = current_date.replace(day=1)
-    selected_month_date += relativedelta(months=-1)
+def get_previous_month_date(selected_month_date):
+    if selected_month_date.month > 1:
+        selected_month_date += relativedelta(months=-1)
+    else:
+        selected_month_date = selected_month_date.replace(month=12)
+        selected_month_date += relativedelta(years=-1)
     return selected_month_date
 
 
