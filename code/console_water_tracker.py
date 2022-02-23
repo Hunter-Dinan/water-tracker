@@ -120,7 +120,8 @@ def main():
                 week_menu_input = input(">>> ")
             selected_week.sort(reverse=True)
             week_water_data = get_week_water_data(selected_week, daily_water_data)
-            # TODO: Change week water data to ascending order
+
+            # Change week water data to ascending order
             week_water_data.sort(key=itemgetter(DATE_INDEX))
             display_week_water_data(week_water_data, current_date)
         elif menu_input == "M":
@@ -143,7 +144,8 @@ def main():
             month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
             month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
             month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
-            # TODO: Change month water data to ascending order
+
+            # Change month water data to ascending order
             month_water_data.sort(key=itemgetter(DATE_INDEX))
             display_month_water_data(month_water_data, current_date)
         elif menu_input == "Y":
@@ -163,56 +165,13 @@ def main():
                 print("Selected year is: {}".format(selected_year_date.year))
                 print(YEAR_SELECTOR_MENU)
                 year_menu_input = input(">>> ")
+            year_dates = get_year_dates(calendar_dates, selected_year_date)
+            year_dates_individual = get_year_dates_individual(year_dates, selected_year_date)
+            year_water_data = get_year_water_data(year_dates_individual, daily_water_data)
 
-            # TODO: Make constant for the [0]
-            year_dates = calendar_dates.yeardatescalendar(selected_year_date.year, 12)[0]
-            year_dates_individual = []
-            for month in year_dates:
-                for week in month:
-                    for day in week:
-                        if day.year == selected_year_date.year:
-                            year_dates_individual.append(day)
-            year_dates_individual.sort(reverse=True)
-
-            # TODO: Get yearly water data
-            year_water_data = []
-            for date in year_dates_individual:
-                for water_data in daily_water_data:
-                    # If date is older than current water_data date then there is no data, set to 0
-                    if date > water_data[DATE_INDEX]:
-                        year_water_data.append([date, 0.0, 'n'])
-                        break
-                    elif date == water_data[DATE_INDEX]:
-                        year_water_data.append(water_data)
-                        break
-                    # If last entry in save data but not at the selected date yet, set to 0
-                    elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
-                        year_water_data.append([date, 0.0, 'n'])
-
-            # TODO: Change year water data to ascending order
+            # Change year water data to ascending order
             year_water_data.sort(key=itemgetter(DATE_INDEX))
-
-            # TODO: Display average yearly water intake
-            # Calculate average water intake over the year (Does not count the days after current date)
-            total_yearly_water_consumed = 0
-            total_days = 0
-            total_days_completed = 0
-            for water_data in year_water_data:
-                if current_date < water_data[DATE_INDEX]:
-                    break
-                total_yearly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-                total_days += 1
-
-                if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-                    total_days_completed += 1
-
-            if total_days != 0:
-                average_year_water_intake = total_yearly_water_consumed / total_days
-                days_completed_percent = (total_days_completed / total_days) * 100
-                print("Average yearly water intake: {:.2f}L".format(average_year_water_intake))
-                print("Percent days completed: {:.2f}%".format(days_completed_percent))
-            else:
-                print("There is no recorded data for this year")
+            display_year_water_data(year_water_data, current_date)
         else:
             print("Invalid menu choice")
 
@@ -415,6 +374,63 @@ def display_month_water_data(month_water_data, current_date):
         print("Percent days completed: {:.2f}%".format(days_completed_percent))
     else:
         print("There is no recorded data for this month")
+
+
+def get_year_dates(calendar_dates, selected_year_date):
+    # The [0] on the end is because yeardatescalendar (calendar module) stores the values in a list of size 1
+    year_dates = calendar_dates.yeardatescalendar(selected_year_date.year, 12)[0]
+    return year_dates
+
+
+def get_year_dates_individual(year_dates, selected_year_date):
+    year_dates_individual = []
+    for month in year_dates:
+        for week in month:
+            for day in week:
+                if day.year == selected_year_date.year:
+                    year_dates_individual.append(day)
+    year_dates_individual.sort(reverse=True)
+    return year_dates_individual
+
+
+def get_year_water_data(year_dates_individual, daily_water_data):
+    year_water_data = []
+    for date in year_dates_individual:
+        for water_data in daily_water_data:
+            # If date is older than current water_data date then there is no data, set to 0
+            if date > water_data[DATE_INDEX]:
+                year_water_data.append([date, 0.0, 'n'])
+                break
+            elif date == water_data[DATE_INDEX]:
+                year_water_data.append(water_data)
+                break
+            # If last entry in save data but not at the selected date yet, set to 0
+            elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
+                year_water_data.append([date, 0.0, 'n'])
+    return year_water_data
+
+
+def display_year_water_data(year_water_data, current_date):
+    # Calculate average water intake over the year (Does not count the days after current date)
+    total_yearly_water_consumed = 0
+    total_days = 0
+    total_days_completed = 0
+    for water_data in year_water_data:
+        if current_date < water_data[DATE_INDEX]:
+            break
+        total_yearly_water_consumed += water_data[WATER_QUANTITY_INDEX]
+        total_days += 1
+
+        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
+            total_days_completed += 1
+
+    if total_days != 0:
+        average_year_water_intake = total_yearly_water_consumed / total_days
+        days_completed_percent = (total_days_completed / total_days) * 100
+        print("Average yearly water intake: {:.2f}L".format(average_year_water_intake))
+        print("Percent days completed: {:.2f}%".format(days_completed_percent))
+    else:
+        print("There is no recorded data for this year")
 
 
 def mark_daily_water_completed(water_data):
