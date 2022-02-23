@@ -1,39 +1,26 @@
 import datetime
 import calendar
 from operator import itemgetter
+
 from dateutil.relativedelta import relativedelta
 
-MENU = """---------------------------------
-Console Water Tracker Menu
-(A)dd water
-(D)aily view
-(W)eekly view
-(M)onthly view
-(Y)early view
-(Q)uit
----------------------------------"""
-YEAR_SELECTOR_MENU = """Press > to go forward
-Press < to go backward
-Press Return or Enter to choose the selected year"""
-MONTH_SELECTOR_MENU = """Press > to go forward
-Press < to go backward
-Press Return or Enter to choose the selected month"""
-WEEK_SELECTOR_MENU = """Press > to go forward
-Press < to go backward
-Press Return or Enter to choose the selected week"""
-WATER_DATA_FILE = "daily_water_save.csv"
-START_OF_MONTH_INDEX = 0
-END_OF_MONTH_INDEX = 3
-REQUIRED_DAILY_WATER_QUANTITY_LITRES = 3.5
-LATEST_DATA_INDEX = 0
-DATE_INDEX = 0
-WATER_QUANTITY_INDEX = 1
-COMPLETED_INDEX = 2
-END_OF_DATE_INDEX = 10
-COMPLETED_CHARACTER = 'y'
-START_OF_WEEK_INDEX = 0
-END_OF_WEEK_INDEX = -1
-LAST_ENTRY_INDEX = -1
+from config import WATER_DATA_FILE
+from config import MENU, WEEK_SELECTOR_MENU, MONTH_SELECTOR_MENU, YEAR_SELECTOR_MENU
+from config import REQUIRED_DAILY_WATER_QUANTITY_LITRES
+from config import DATE_INDEX
+from config import WATER_QUANTITY_INDEX
+from config import COMPLETED_INDEX
+from config import COMPLETED_CHARACTER
+from config import START_OF_WEEK_INDEX
+from config import END_OF_WEEK_INDEX
+from config import START_OF_MONTH_INDEX
+from config import END_OF_MONTH_INDEX
+from config import LATEST_DATA_INDEX
+from config import LAST_ENTRY_INDEX
+
+from yearly_view_functions import get_year_dates
+from yearly_view_functions import get_year_dates_individual
+from yearly_view_functions import get_year_water_data
 
 
 def main():
@@ -376,40 +363,7 @@ def display_month_water_data(month_water_data, current_date):
         print("There is no recorded data for this month")
 
 
-def get_year_dates(calendar_dates, selected_year_date):
-    # The [0] on the end is because yeardatescalendar (calendar module) stores the values in a list of size 1
-    year_dates = calendar_dates.yeardatescalendar(selected_year_date.year, 12)[0]
-    return year_dates
-
-
-def get_year_dates_individual(year_dates, selected_year_date):
-    year_dates_individual = []
-    for month in year_dates:
-        for week in month:
-            for day in week:
-                if day.year == selected_year_date.year:
-                    year_dates_individual.append(day)
-    year_dates_individual.sort(reverse=True)
-    return year_dates_individual
-
-
-def get_year_water_data(year_dates_individual, daily_water_data):
-    year_water_data = []
-    for date in year_dates_individual:
-        for water_data in daily_water_data:
-            # If date is older than current water_data date then there is no data, set to 0
-            if date > water_data[DATE_INDEX]:
-                year_water_data.append([date, 0.0, 'n'])
-                break
-            elif date == water_data[DATE_INDEX]:
-                year_water_data.append(water_data)
-                break
-            # If last entry in save data but not at the selected date yet, set to 0
-            elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
-                year_water_data.append([date, 0.0, 'n'])
-    return year_water_data
-
-
+# TODO: Add function to console_display_functions
 def display_year_water_data(year_water_data, current_date):
     # Calculate average water intake over the year (Does not count the days after current date)
     total_yearly_water_consumed = 0
