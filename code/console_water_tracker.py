@@ -22,8 +22,9 @@ from yearly_view_functions import get_dates_in_year_descending
 from yearly_view_functions import get_year_water_data_descending
 from yearly_view_functions import sort_year_water_data_ascending
 
-from monthly_view_functions import get_month_dates_individual
-from monthly_view_functions import get_month_water_data
+from monthly_view_functions import get_dates_in_month_descending
+from monthly_view_functions import get_month_water_data_descending
+from monthly_view_functions import sort_month_water_data_ascending
 
 
 def main():
@@ -116,27 +117,24 @@ def main():
             display_week_water_data(week_water_data, current_date)
         elif menu_input == "M":
             print("Monthly view")
-            # Set selected month date to the first day of the chosen month
-            selected_month_date = current_date.replace(day=1)
-            print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
+            # Set selected month date object to the first day of the chosen month
+            selected_month_date_obj = current_date.replace(day=1)
+            print("Selected month is: {}/{}".format(selected_month_date_obj.month, selected_month_date_obj.year))
             print(MONTH_SELECTOR_MENU)
             month_menu_input = input(">>> ")
             while month_menu_input != "":
                 if month_menu_input == ">":
-                    selected_month_date += relativedelta(months=+1)
+                    selected_month_date_obj += relativedelta(months=+1)
                 elif month_menu_input == "<":
-                    selected_month_date += relativedelta(months=-1)
+                    selected_month_date_obj += relativedelta(months=-1)
                 else:
                     print("Invalid menu choice")
-                print("Selected month is: {}/{}".format(selected_month_date.month, selected_month_date.year))
+                print("Selected month is: {}/{}".format(selected_month_date_obj.month, selected_month_date_obj.year))
                 print(MONTH_SELECTOR_MENU)
                 month_menu_input = input(">>> ")
-            month_dates = calendar_dates.monthdatescalendar(selected_month_date.year, selected_month_date.month)
-            month_dates_individual = get_month_dates_individual(month_dates, selected_month_date.month)
-            month_water_data = get_month_water_data(month_dates_individual, daily_water_data)
-
-            # Change month water data to ascending order
-            month_water_data.sort(key=itemgetter(DATE_INDEX))
+            dates_in_month_descending = get_dates_in_month_descending(calendar_dates, selected_month_date_obj)
+            month_water_data = get_month_water_data_descending(dates_in_month_descending, daily_water_data)
+            sort_month_water_data_ascending(month_water_data)
             display_month_water_data(month_water_data, current_date)
         elif menu_input == "Y":
             print("Yearly View")

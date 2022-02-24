@@ -6,25 +6,26 @@ from config import DATE_INDEX
 from config import LAST_ENTRY_INDEX
 
 
-def get_dates_in_year_week_format(calendar_dates, selected_year_date):
+def get_dates_in_year_week_format(calendar_dates, selected_year_date_obj):
     # The [0] on the end is because yeardatescalendar (calendar module) stores the values in a list of size 1
-    dates_in_year_week_format = calendar_dates.yeardatescalendar(selected_year_date.year, 12)[0]
+    dates_in_year_week_format = calendar_dates.yeardatescalendar(selected_year_date_obj.year, 12)[0]
     return dates_in_year_week_format
 
 
-def get_individual_dates_in_year(dates_in_year_week_format, selected_year_date):
+def get_individual_dates_in_year(dates_in_year_week_format, selected_year_date_obj):
     individual_dates_in_year = []
     for month in dates_in_year_week_format:
         for week in month:
             for day in week:
-                if day.year == selected_year_date.year:
+                # Calendar module includes days before and after the selected year
+                if day.year == selected_year_date_obj.year:
                     individual_dates_in_year.append(day)
     return individual_dates_in_year
 
 
-def get_dates_in_year_descending(calendar_dates, selected_year_date):
-    dates_in_year_week_format = get_dates_in_year_week_format(calendar_dates, selected_year_date)
-    dates_in_year = get_individual_dates_in_year(dates_in_year_week_format, selected_year_date)
+def get_dates_in_year_descending(calendar_dates, selected_year_date_obj):
+    dates_in_year_week_format = get_dates_in_year_week_format(calendar_dates, selected_year_date_obj)
+    dates_in_year = get_individual_dates_in_year(dates_in_year_week_format, selected_year_date_obj)
     dates_in_year.sort(reverse=True)
     return dates_in_year
 
