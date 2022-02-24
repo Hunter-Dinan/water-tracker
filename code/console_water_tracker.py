@@ -18,16 +18,22 @@ from config import END_OF_MONTH_INDEX
 from config import LATEST_DATA_INDEX
 from config import LAST_ENTRY_INDEX
 
-from yearly_view_functions import get_dates_in_year_descending
-from yearly_view_functions import get_year_water_data_descending
-from yearly_view_functions import sort_year_water_data_ascending
+from get_and_save_data_to_file_functions import get_daily_water_data
+from get_and_save_data_to_file_functions import get_current_date_water_data
+from get_and_save_data_to_file_functions import format_daily_water_data_for_save
+from get_and_save_data_to_file_functions import save_daily_water_data_in_file
 
 from monthly_view_functions import get_dates_in_month_descending
 from monthly_view_functions import get_month_water_data_descending
 from monthly_view_functions import sort_month_water_data_ascending
 
+from yearly_view_functions import get_dates_in_year_descending
+from yearly_view_functions import get_year_water_data_descending
+from yearly_view_functions import sort_year_water_data_ascending
+
 
 def main():
+    # TODO: Sort out all the cluttered comments before main loop starts
     # Initial date format in save file: YYYY-MM-DD
 
     calendar_dates = calendar.Calendar()
@@ -117,7 +123,6 @@ def main():
             display_week_water_data(week_water_data, current_date)
         elif menu_input == "M":
             print("Monthly view")
-            # Set selected month date object to the first day of the chosen month
             selected_month_date_obj = current_date.replace(day=1)
             print("Selected month is: {}/{}".format(selected_month_date_obj.month, selected_month_date_obj.year))
             print(MONTH_SELECTOR_MENU)
@@ -138,7 +143,6 @@ def main():
             display_month_water_data(month_water_data, current_date)
         elif menu_input == "Y":
             print("Yearly View")
-            # Set selected year date object to the first day of the chosen year
             selected_year_date_obj = current_date.replace(day=1, month=1)
             print("Selected year is: {}".format(selected_year_date_obj.year))
             print(YEAR_SELECTOR_MENU)
@@ -161,64 +165,17 @@ def main():
             print("Invalid menu choice")
 
         if current_water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-            print("Minimum required daily water intake reached!")
+            display_completed_required_daily_water_message()
         print(MENU)
         menu_input = input(">>> ").upper()
-    format_water_data_for_save(daily_water_data)
-    save_water_data_in_file(daily_water_data, WATER_DATA_FILE)
+    format_daily_water_data_for_save(daily_water_data)
+    save_daily_water_data_in_file(daily_water_data, WATER_DATA_FILE)
     print("Program terminated.")
 
 
-def get_daily_water_data(current_date):
-    daily_water_data = []
-    input_file = open(WATER_DATA_FILE, "r")
-    for line in input_file:
-        line = line.strip()
-        water_data = line.split(',')
-
-        water_data[WATER_QUANTITY_INDEX] = float(water_data[WATER_QUANTITY_INDEX])
-        date = water_data[DATE_INDEX]
-        water_data[DATE_INDEX] = convert_date_str_to_date_obj(date)
-
-        daily_water_data.append(water_data)
-    input_file.close()
-
-    # Add current date water data if it does not exist
-    if daily_water_data:
-        latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-        if current_date == latest_water_data[DATE_INDEX]:
-            return daily_water_data
-        else:
-            add_current_date_water_data(daily_water_data, current_date)
-            sort_daily_water_data_latest_date_first(daily_water_data)
-            return daily_water_data
-    add_current_date_water_data(daily_water_data, current_date)
-    sort_daily_water_data_latest_date_first(daily_water_data)
-    return daily_water_data
-
-
-def convert_date_str_to_date_obj(date_str):
-    # date_str format: YYYY-MM-DD
-    year = int(date_str[:4])
-    month = int(date_str[5:7])
-    day = int(date_str[8:10])
-    return datetime.date(year, month, day)
-
-
-def add_current_date_water_data(daily_water_data, current_date):
-    daily_water_data.append([current_date, 0.0, 'n'])
-    return daily_water_data
-
-
-def get_current_date_water_data(daily_water_data: list):
-    latest_water_data = daily_water_data[LATEST_DATA_INDEX]
-    return latest_water_data
-
-
-def sort_daily_water_data_latest_date_first(daily_water_data):
-    # Sort data with latest date at top
-    daily_water_data.sort(key=itemgetter(DATE_INDEX), reverse=True)
-    return daily_water_data
+# TODO: Add function to console_display_functions
+def display_completed_required_daily_water_message():
+    print("Minimum required daily water intake reached!")
 
 
 def get_selected_week_string_format(selected_week):
@@ -273,6 +230,7 @@ def get_week_water_data(selected_week, daily_water_data):
     return week_water_data
 
 
+# TODO: Add function to console_display_functions
 def display_week_water_data(week_water_data, current_date):
     # Calculate average water intake over the week (Does not count the days after current date)
     total_weekly_water_consumed = 0
@@ -388,24 +346,10 @@ def get_water_quantity_litres(current_water_quantity, required_daily_water_quant
     return water_quantity
 
 
+# TODO: Add function to console_display_functions
 def display_daily_water_intake_litres(current_water_quantity, required_daily_water_quantity):
     print("Current daily water intake: {}L , Required daily water intake: {}L".format(
         current_water_quantity, required_daily_water_quantity))
-
-
-def format_water_data_for_save(daily_water_data):
-    # Convert datetime.date obj to string: YYYY-MM-DD
-    for water_data in daily_water_data:
-        water_data[DATE_INDEX] = str(water_data[DATE_INDEX])
-    return daily_water_data
-
-
-def save_water_data_in_file(daily_water_data, filename):
-    output_file = open(filename, "w")
-    for water_data in daily_water_data:
-        print("{},{},{}".format(water_data[DATE_INDEX], water_data[WATER_QUANTITY_INDEX],
-                                water_data[COMPLETED_INDEX]), file=output_file)
-    output_file.close()
 
 
 if __name__ == '__main__':
