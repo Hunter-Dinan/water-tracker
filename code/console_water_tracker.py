@@ -18,9 +18,9 @@ from config import END_OF_MONTH_INDEX
 from config import LATEST_DATA_INDEX
 from config import LAST_ENTRY_INDEX
 
-from yearly_view_functions import get_year_dates
-from yearly_view_functions import get_year_dates_individual
-from yearly_view_functions import get_year_water_data
+from yearly_view_functions import get_dates_in_year_descending
+from yearly_view_functions import get_year_water_data_descending
+from yearly_view_functions import sort_year_water_data_ascending
 
 from monthly_view_functions import get_month_dates_individual
 from monthly_view_functions import get_month_water_data
@@ -140,27 +140,24 @@ def main():
             display_month_water_data(month_water_data, current_date)
         elif menu_input == "Y":
             print("Yearly View")
-            # Set selected year date to the first day of the chosen year
-            selected_year_date = current_date.replace(day=1, month=1)
-            print("Selected year is: {}".format(selected_year_date.year))
+            # Set selected year date object to the first day of the chosen year
+            selected_year_date_obj = current_date.replace(day=1, month=1)
+            print("Selected year is: {}".format(selected_year_date_obj.year))
             print(YEAR_SELECTOR_MENU)
             year_menu_input = input(">>> ")
             while year_menu_input != "":
                 if year_menu_input == ">":
-                    selected_year_date += relativedelta(years=+1)
+                    selected_year_date_obj += relativedelta(years=+1)
                 elif year_menu_input == "<":
-                    selected_year_date += relativedelta(years=-1)
+                    selected_year_date_obj += relativedelta(years=-1)
                 else:
                     print("Invalid menu choice")
-                print("Selected year is: {}".format(selected_year_date.year))
+                print("Selected year is: {}".format(selected_year_date_obj.year))
                 print(YEAR_SELECTOR_MENU)
                 year_menu_input = input(">>> ")
-            year_dates = get_year_dates(calendar_dates, selected_year_date)
-            year_dates_individual = get_year_dates_individual(year_dates, selected_year_date)
-            year_water_data = get_year_water_data(year_dates_individual, daily_water_data)
-
-            # Change year water data to ascending order
-            year_water_data.sort(key=itemgetter(DATE_INDEX))
+            dates_in_year_descending = get_dates_in_year_descending(calendar_dates, selected_year_date_obj)
+            year_water_data = get_year_water_data_descending(dates_in_year_descending, daily_water_data)
+            sort_year_water_data_ascending(year_water_data)
             display_year_water_data(year_water_data, current_date)
         else:
             print("Invalid menu choice")
