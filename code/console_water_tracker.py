@@ -15,7 +15,6 @@ from config import START_OF_WEEK_INDEX
 from config import END_OF_WEEK_INDEX
 from config import START_OF_MONTH_INDEX
 from config import END_OF_MONTH_INDEX
-from config import LATEST_DATA_INDEX
 from config import LAST_ENTRY_INDEX
 
 from get_and_save_data_to_file_functions import get_daily_water_data
@@ -31,8 +30,17 @@ from yearly_view_functions import get_dates_in_year_descending
 from yearly_view_functions import get_year_water_data_descending
 from yearly_view_functions import sort_year_water_data_ascending
 
+from console_display_functions import display_completed_required_daily_water_message
+from console_display_functions import display_daily_water_intake_litres
+from console_display_functions import display_week_water_data
+from console_display_functions import display_month_water_data
+from console_display_functions import display_year_water_data
+
 
 def main():
+    # TODO: Make separate average calculation functions for each of the views and remove them
+    #  from this function (console_display_functions.py)
+
     # TODO: Sort out all the cluttered comments before main loop starts
     # Initial date format in save file: YYYY-MM-DD
 
@@ -70,7 +78,7 @@ def main():
             if current_water_data[COMPLETED_INDEX] != COMPLETED_CHARACTER:
                 if current_water_quantity_litres >= REQUIRED_DAILY_WATER_QUANTITY_LITRES:
                     mark_daily_water_completed(current_water_data)
-                    print("You have reached the minimum required daily water intake!")
+                    display_completed_required_daily_water_message()
         elif menu_input == "D":
             display_daily_water_intake_litres(current_water_quantity_litres,
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
@@ -173,11 +181,6 @@ def main():
     print("Program terminated.")
 
 
-# TODO: Add function to console_display_functions
-def display_completed_required_daily_water_message():
-    print("Minimum required daily water intake reached!")
-
-
 def get_selected_week_string_format(selected_week):
     # selected_week_str format: DD/MM - DD/MM
     first_day = selected_week[START_OF_WEEK_INDEX]
@@ -230,91 +233,6 @@ def get_week_water_data(selected_week, daily_water_data):
     return week_water_data
 
 
-# TODO: Add function to console_display_functions
-def display_week_water_data(week_water_data, current_date):
-    # Calculate average water intake over the week (Does not count the days after current date)
-    total_weekly_water_consumed = 0
-    total_days = 0
-    total_days_completed = 0
-    for water_data in week_water_data:
-        if current_date < water_data[DATE_INDEX]:
-            break
-        completed_str = get_completed_string_display_format(water_data)
-        print("Date: {}/{}, Water intake: {:.2f}L, Completed: {}".format(water_data[DATE_INDEX].day,
-                                                                         water_data[DATE_INDEX].month,
-                                                                         water_data[WATER_QUANTITY_INDEX],
-                                                                         completed_str))
-
-        total_weekly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-        total_days += 1
-        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-            total_days_completed += 1
-
-    if total_days != 0:
-        average_week_water_intake = total_weekly_water_consumed / total_days
-        days_completed_percent = (total_days_completed / total_days) * 100
-        print("Average weekly water intake: {:.2f}L".format(average_week_water_intake))
-        print("Percent days completed: {:.2f}%".format(days_completed_percent))
-    else:
-        print("There is no recorded data for this week")
-
-
-def get_completed_string_display_format(water_data):
-    if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-        completed_str = "Yes"
-    else:
-        completed_str = "No"
-    return completed_str
-
-
-# TODO: Add function to console_display_functions
-def display_month_water_data(month_water_data, current_date):
-    # Calculate average water intake over the month (Does not count the days after current date)
-    total_monthly_water_consumed = 0
-    total_days = 0
-    total_days_completed = 0
-    for water_data in month_water_data:
-        if current_date < water_data[DATE_INDEX]:
-            break
-        total_monthly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-        total_days += 1
-
-        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-            total_days_completed += 1
-
-    if total_days != 0:
-        average_month_water_intake = total_monthly_water_consumed / total_days
-        days_completed_percent = (total_days_completed / total_days) * 100
-        print("Average monthly water intake: {:.2f}L".format(average_month_water_intake))
-        print("Percent days completed: {:.2f}%".format(days_completed_percent))
-    else:
-        print("There is no recorded data for this month")
-
-
-# TODO: Add function to console_display_functions
-def display_year_water_data(year_water_data, current_date):
-    # Calculate average water intake over the year (Does not count the days after current date)
-    total_yearly_water_consumed = 0
-    total_days = 0
-    total_days_completed = 0
-    for water_data in year_water_data:
-        if current_date < water_data[DATE_INDEX]:
-            break
-        total_yearly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-        total_days += 1
-
-        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-            total_days_completed += 1
-
-    if total_days != 0:
-        average_year_water_intake = total_yearly_water_consumed / total_days
-        days_completed_percent = (total_days_completed / total_days) * 100
-        print("Average yearly water intake: {:.2f}L".format(average_year_water_intake))
-        print("Percent days completed: {:.2f}%".format(days_completed_percent))
-    else:
-        print("There is no recorded data for this year")
-
-
 def mark_daily_water_completed(water_data):
     water_data[COMPLETED_INDEX] = "y"
     return water_data
@@ -344,12 +262,6 @@ def get_water_quantity_litres(current_water_quantity, required_daily_water_quant
     print("Enter quantity of water to add in litres:")
     water_quantity = get_valid_float(">>> ")
     return water_quantity
-
-
-# TODO: Add function to console_display_functions
-def display_daily_water_intake_litres(current_water_quantity, required_daily_water_quantity):
-    print("Current daily water intake: {}L , Required daily water intake: {}L".format(
-        current_water_quantity, required_daily_water_quantity))
 
 
 if __name__ == '__main__':
