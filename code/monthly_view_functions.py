@@ -17,7 +17,7 @@ def get_individual_dates_in_month(dates_in_month_week_format, selected_month_dat
     for week in dates_in_month_week_format:
         for day in week:
             # Calendar module includes days before and after the selected month
-            if day.month == selected_month_date_obj:
+            if day.month == selected_month_date_obj.month:
                 individual_dates_in_month.append(day)
     return individual_dates_in_month
 

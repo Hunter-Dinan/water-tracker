@@ -5,7 +5,8 @@ from config import WATER_QUANTITY_INDEX
 from config import COMPLETED_INDEX
 from config import COMPLETED_CHARACTER
 
-# TODO: Make separate average calculation functions for each of the views and remove them from this function
+from calculation_functions import calculate_average_water_intake
+from calculation_functions import calculate_total_days_completed_percentage
 
 
 def display_completed_required_daily_water_message():
@@ -26,10 +27,6 @@ def get_completed_string_display_format(water_data):
 
 
 def display_week_water_data(week_water_data, current_date):
-    # Calculate average water intake over the week (Does not count the days after current date)
-    total_weekly_water_consumed = 0
-    total_days = 0
-    total_days_completed = 0
     for water_data in week_water_data:
         if current_date < water_data[DATE_INDEX]:
             break
@@ -39,61 +36,36 @@ def display_week_water_data(week_water_data, current_date):
                                                                          water_data[WATER_QUANTITY_INDEX],
                                                                          completed_str))
 
-        total_weekly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-        total_days += 1
-        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-            total_days_completed += 1
+    average_weekly_water_intake = calculate_average_water_intake(week_water_data, current_date)
+    total_days_completed_percent = calculate_total_days_completed_percentage(week_water_data, current_date)
 
-    if total_days != 0:
-        average_week_water_intake = total_weekly_water_consumed / total_days
-        days_completed_percent = (total_days_completed / total_days) * 100
-        print("Average weekly water intake: {:.2f}L".format(average_week_water_intake))
-        print("Percent days completed: {:.2f}%".format(days_completed_percent))
+    # If average water intake is None, total days completed will also be None
+    if average_weekly_water_intake is not None:
+        print("Average weekly water intake: {:.2f}L".format(average_weekly_water_intake))
+        print("Percent days completed: {:.2f}%".format(total_days_completed_percent))
     else:
         print("There is no recorded data for this week")
 
 
 def display_month_water_data(month_water_data, current_date):
-    # Calculate average water intake over the month (Does not count the days after current date)
-    total_monthly_water_consumed = 0
-    total_days = 0
-    total_days_completed = 0
-    for water_data in month_water_data:
-        if current_date < water_data[DATE_INDEX]:
-            break
-        total_monthly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-        total_days += 1
+    average_monthly_water_intake = calculate_average_water_intake(month_water_data, current_date)
+    total_days_completed_percent = calculate_total_days_completed_percentage(month_water_data, current_date)
 
-        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-            total_days_completed += 1
-
-    if total_days != 0:
-        average_month_water_intake = total_monthly_water_consumed / total_days
-        days_completed_percent = (total_days_completed / total_days) * 100
-        print("Average monthly water intake: {:.2f}L".format(average_month_water_intake))
-        print("Percent days completed: {:.2f}%".format(days_completed_percent))
+    # If average water intake is None, total days completed will also be None
+    if average_monthly_water_intake is not None:
+        print("Average monthly water intake: {:.2f}L".format(average_monthly_water_intake))
+        print("Percent days completed: {:.2f}%".format(total_days_completed_percent))
     else:
         print("There is no recorded data for this month")
 
 
 def display_year_water_data(year_water_data, current_date):
-    # Calculate average water intake over the year (Does not count the days after current date)
-    total_yearly_water_consumed = 0
-    total_days = 0
-    total_days_completed = 0
-    for water_data in year_water_data:
-        if current_date < water_data[DATE_INDEX]:
-            break
-        total_yearly_water_consumed += water_data[WATER_QUANTITY_INDEX]
-        total_days += 1
+    average_yearly_water_intake = calculate_average_water_intake(year_water_data, current_date)
+    total_days_completed_percent = calculate_total_days_completed_percentage(year_water_data, current_date)
 
-        if water_data[COMPLETED_INDEX] == COMPLETED_CHARACTER:
-            total_days_completed += 1
-
-    if total_days != 0:
-        average_year_water_intake = total_yearly_water_consumed / total_days
-        days_completed_percent = (total_days_completed / total_days) * 100
-        print("Average yearly water intake: {:.2f}L".format(average_year_water_intake))
-        print("Percent days completed: {:.2f}%".format(days_completed_percent))
+    # If average water intake is None, total days completed will also be None
+    if average_yearly_water_intake is not None:
+        print("Average yearly water intake: {:.2f}L".format(average_yearly_water_intake))
+        print("Percent days completed: {:.2f}%".format(total_days_completed_percent))
     else:
         print("There is no recorded data for this year")

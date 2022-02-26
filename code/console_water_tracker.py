@@ -44,11 +44,12 @@ from console_display_functions import display_month_water_data
 from console_display_functions import display_year_water_data
 
 # TODO: Make separate average calculation functions for each of the views and remove them
-#  from this function (console_display_functions.py)
+#  from this file (console_display_functions.py)
 
 
 def main():
-    # Use datetime.date objects within program (calendar module functions return lists of datetime.date objects)
+    # This program uses datetime.date objects for dates
+    # Calendar module functions return lists of datetime.date objects
     calendar_dates = calendar.Calendar()
     current_date = datetime.date.today()
 
