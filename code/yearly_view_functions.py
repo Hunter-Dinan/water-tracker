@@ -1,9 +1,7 @@
 """Functions for yearly view."""
 
-from operator import itemgetter
-
-from config import DATE_INDEX
-from config import LAST_ENTRY_INDEX
+from common_water_data_functions import get_water_data_list_descending
+from common_water_data_functions import sort_water_data_list_ascending
 
 
 def get_dates_in_year_week_format(calendar_dates, selected_year_date_obj):
@@ -31,22 +29,10 @@ def get_dates_in_year_descending(calendar_dates, selected_year_date_obj):
 
 
 def get_year_water_data_descending(dates_in_year_descending, all_water_data):
-    year_water_data = []
-    for date in dates_in_year_descending:
-        for water_data in all_water_data:
-            # If date is older than current water_data date then there is no data, set to 0
-            if date > water_data[DATE_INDEX]:
-                year_water_data.append([date, 0.0, 'n'])
-                break
-            elif date == water_data[DATE_INDEX]:
-                year_water_data.append(water_data)
-                break
-            # If last entry in save data but not at the selected date yet, set to 0
-            elif water_data is all_water_data[LAST_ENTRY_INDEX]:
-                year_water_data.append([date, 0.0, 'n'])
+    year_water_data = get_water_data_list_descending(dates_in_year_descending, all_water_data)
     return year_water_data
 
 
 def sort_year_water_data_ascending(year_water_data):
-    year_water_data.sort(key=itemgetter(DATE_INDEX))
+    sort_water_data_list_ascending(year_water_data)
     return year_water_data
