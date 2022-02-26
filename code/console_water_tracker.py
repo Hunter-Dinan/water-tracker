@@ -25,6 +25,7 @@ from get_and_save_data_to_file_functions import save_daily_water_data_in_file
 from add_water_functions import get_water_quantity_litres
 from add_water_functions import mark_daily_water_data_completed
 
+from monthly_view_functions import get_dates_in_month_week_format
 from monthly_view_functions import get_dates_in_month_descending
 from monthly_view_functions import get_month_water_data_descending
 from monthly_view_functions import sort_month_water_data_ascending
@@ -79,50 +80,48 @@ def main():
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
         elif menu_input == "W":
             print("Weekly view")
-            month_dates = calendar_dates.monthdatescalendar(current_date.year, current_date.month)
-            selected_week_index = get_current_week_index(month_dates, current_date)
-            selected_week = month_dates[selected_week_index]
-            selected_week_str = get_selected_week_string_format(selected_week)
+            selected_month_date_obj = current_date.replace(day=1)
+            dates_in_month_week_format = get_dates_in_month_week_format(calendar_dates, current_date)
 
-            selected_month_date = current_date.replace(day=1)
+            selected_week_index = get_current_week_index(dates_in_month_week_format, current_date)
+            dates_in_selected_week = dates_in_month_week_format[selected_week_index]
+            dates_in_selected_week_string_format = get_dates_in_selected_week_string_format(dates_in_selected_week)
 
-            print("Selected week is: {}".format(selected_week_str))
+            print("Selected week is: {}".format(dates_in_selected_week_string_format))
             print(WEEK_SELECTOR_MENU)
             week_menu_input = input(">>> ")
             while week_menu_input != "":
                 if week_menu_input == ">":
                     if selected_week_index < END_OF_MONTH_INDEX:
                         selected_week_index += 1
-                        selected_week = month_dates[selected_week_index]
+                        dates_in_selected_week = dates_in_month_week_format[selected_week_index]
                     else:
                         # Move selection to start of next month
-                        selected_month_date = get_next_month_date(selected_month_date)
-                        month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
-                                                                        selected_month_date.month)
+                        selected_month_date_obj = get_next_month_date_obj(selected_month_date_obj)
+                        dates_in_month_week_format = get_dates_in_month_week_format(calendar_dates,
+                                                                                    selected_month_date_obj)
                         selected_week_index = START_OF_MONTH_INDEX
-                        selected_week = month_dates[selected_week_index]
+                        dates_in_selected_week = dates_in_month_week_format[selected_week_index]
                 elif week_menu_input == "<":
                     if selected_week_index > START_OF_MONTH_INDEX:
                         selected_week_index -= 1
-                        selected_week = month_dates[selected_week_index]
+                        dates_in_selected_week = dates_in_month_week_format[selected_week_index]
                     else:
                         # Move selection to end of previous month
-                        selected_month_date = get_previous_month_date(selected_month_date)
-                        month_dates = calendar_dates.monthdatescalendar(selected_month_date.year,
-                                                                        selected_month_date.month)
+                        selected_month_date_obj = get_previous_month_date_obj(selected_month_date_obj)
+                        dates_in_month_week_format = get_dates_in_month_week_format(calendar_dates,
+                                                                                    selected_month_date_obj)
                         selected_week_index = END_OF_MONTH_INDEX
-                        selected_week = month_dates[selected_week_index]
+                        dates_in_selected_week = dates_in_month_week_format[selected_week_index]
                 else:
                     print("Invalid menu choice")
-                selected_week_str = get_selected_week_string_format(selected_week)
-                print("Selected week is: {}".format(selected_week_str))
+                dates_in_selected_week_string_format = get_dates_in_selected_week_string_format(dates_in_selected_week)
+                print("Selected week is: {}".format(dates_in_selected_week_string_format))
                 print(WEEK_SELECTOR_MENU)
                 week_menu_input = input(">>> ")
-            selected_week.sort(reverse=True)
-            week_water_data = get_week_water_data(selected_week, daily_water_data)
-
-            # Change week water data to ascending order
-            week_water_data.sort(key=itemgetter(DATE_INDEX))
+            dates_in_week_descending = get_dates_in_week_descending(dates_in_selected_week)
+            week_water_data = get_week_water_data_descending(dates_in_week_descending, daily_water_data)
+            sort_week_water_data_ascending(week_water_data)
             display_week_water_data(week_water_data, current_date)
         elif menu_input == "M":
             print("Monthly view")
@@ -176,44 +175,57 @@ def main():
     print("Program terminated.")
 
 
-def get_selected_week_string_format(selected_week):
-    # selected_week_str format: DD/MM - DD/MM
-    first_day = selected_week[START_OF_WEEK_INDEX]
-    last_day = selected_week[END_OF_WEEK_INDEX]
-    selected_week_str = "{}/{} - {}/{}".format(first_day.day, first_day.month, last_day.day,
-                                               last_day.month)
-    return selected_week_str
+def sort_week_water_data_ascending(week_water_data):
+    week_water_data.sort(key=itemgetter(DATE_INDEX))
+    return week_water_data
 
 
-def get_current_week_index(month_dates, current_date):
-    for week_index, week in enumerate(month_dates):
+def get_dates_in_week_descending(dates_in_selected_week):
+    # Unlike monthly and yearly view versions of this function, the weekly version only needs to sort as it is already
+    # separated into individual dates
+    dates_in_week_descending = dates_in_selected_week.copy()
+    dates_in_week_descending.sort(reverse=True)
+    return dates_in_week_descending
+
+
+def get_dates_in_selected_week_string_format(dates_in_selected_week):
+    # String format: DD/MM - DD/MM
+    first_day = dates_in_selected_week[START_OF_WEEK_INDEX]
+    last_day = dates_in_selected_week[END_OF_WEEK_INDEX]
+    dates_in_selected_week_string_format = "{}/{} - {}/{}".format(first_day.day, first_day.month, last_day.day,
+                                                                  last_day.month)
+    return dates_in_selected_week_string_format
+
+
+def get_current_week_index(dates_in_month_week_format, current_date):
+    for week_index, week in enumerate(dates_in_month_week_format):
         for day in week:
             if current_date == day:
                 current_week_index = week_index
     return current_week_index
 
 
-def get_next_month_date(selected_month_date):
-    if selected_month_date.month < 12:
-        selected_month_date += relativedelta(months=+1)
+def get_next_month_date_obj(selected_month_date_obj):
+    if selected_month_date_obj.month < 12:
+        selected_month_date_obj += relativedelta(months=+1)
     else:
-        selected_month_date = selected_month_date.replace(month=1)
-        selected_month_date += relativedelta(year=+1)
-    return selected_month_date
+        selected_month_date_obj = selected_month_date_obj.replace(month=1)
+        selected_month_date_obj += relativedelta(year=+1)
+    return selected_month_date_obj
 
 
-def get_previous_month_date(selected_month_date):
-    if selected_month_date.month > 1:
-        selected_month_date += relativedelta(months=-1)
+def get_previous_month_date_obj(selected_month_date_obj):
+    if selected_month_date_obj.month > 1:
+        selected_month_date_obj += relativedelta(months=-1)
     else:
-        selected_month_date = selected_month_date.replace(month=12)
-        selected_month_date += relativedelta(years=-1)
-    return selected_month_date
+        selected_month_date_obj = selected_month_date_obj.replace(month=12)
+        selected_month_date_obj += relativedelta(years=-1)
+    return selected_month_date_obj
 
 
-def get_week_water_data(selected_week, daily_water_data):
+def get_week_water_data_descending(dates_in_week_descending, daily_water_data):
     week_water_data = []
-    for date in selected_week:
+    for date in dates_in_week_descending:
         for water_data in daily_water_data:
             # If date is older than current water_data date then there is no data, set to 0
             if date > water_data[DATE_INDEX]:

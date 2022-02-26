@@ -1,3 +1,5 @@
+"""Contains all constants and console menus."""
+
 MENU = """---------------------------------
 Console Water Tracker Menu
 Press A: Add water
