@@ -5,7 +5,6 @@ from config import WATER_QUANTITY_INDEX
 from config import COMPLETED_INDEX
 from config import COMPLETED_CHARACTER
 
-
 # TODO: Make separate average calculation functions for each of the views and remove them from this function
 
 

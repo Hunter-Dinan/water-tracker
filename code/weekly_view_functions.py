@@ -53,10 +53,10 @@ def get_dates_in_week_descending(dates_in_selected_week):
     return dates_in_week_descending
 
 
-def get_week_water_data_descending(dates_in_week_descending, daily_water_data):
+def get_week_water_data_descending(dates_in_week_descending, all_water_data):
     week_water_data = []
     for date in dates_in_week_descending:
-        for water_data in daily_water_data:
+        for water_data in all_water_data:
             # If date is older than current water_data date then there is no data, set to 0
             if date > water_data[DATE_INDEX]:
                 week_water_data.append([date, 0.0, 'n'])
@@ -65,7 +65,7 @@ def get_week_water_data_descending(dates_in_week_descending, daily_water_data):
                 week_water_data.append(water_data)
                 break
             # If last entry in save data but not at the selected date yet, set to 0
-            elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
+            elif water_data is all_water_data[LAST_ENTRY_INDEX]:
                 week_water_data.append([date, 0.0, 'n'])
     return week_water_data
 

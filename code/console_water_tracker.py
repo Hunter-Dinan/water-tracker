@@ -12,13 +12,13 @@ from config import COMPLETED_CHARACTER
 from config import START_OF_MONTH_INDEX
 from config import END_OF_MONTH_INDEX
 
-from get_and_save_data_to_file_functions import get_daily_water_data
+from get_and_save_data_to_file_functions import get_all_water_data_descending
 from get_and_save_data_to_file_functions import get_current_date_water_data
-from get_and_save_data_to_file_functions import format_daily_water_data_for_save
-from get_and_save_data_to_file_functions import save_daily_water_data_in_file
+from get_and_save_data_to_file_functions import format_all_water_data_for_save
+from get_and_save_data_to_file_functions import save_all_water_data_in_file
 
 from add_water_functions import get_water_quantity_litres
-from add_water_functions import mark_daily_water_data_completed
+from add_water_functions import mark_water_data_completed
 
 from weekly_view_functions import get_current_week_index
 from weekly_view_functions import get_dates_in_selected_week_string_format
@@ -43,25 +43,19 @@ from console_display_functions import display_week_water_data
 from console_display_functions import display_month_water_data
 from console_display_functions import display_year_water_data
 
+# TODO: Make separate average calculation functions for each of the views and remove them
+#  from this function (console_display_functions.py)
+
 
 def main():
-    # TODO: Make separate average calculation functions for each of the views and remove them
-    #  from this function (console_display_functions.py)
-
-    # TODO: Sort out all the cluttered comments before main loop starts
-    # Initial date format in save file: YYYY-MM-DD
-
+    # Use datetime.date objects within program (calendar module functions return lists of datetime.date objects)
     calendar_dates = calendar.Calendar()
-
-    # Use datetime.date objects within program
     current_date = datetime.date.today()
 
-    # Daily water data format: [[datetime.date(YYYY, MM, DD),0.0,'n'], [datetime.date(YYYY, MM, DD),0.0,'n']]
-    # Daily water data is sorted in descending order by date (latest date is first)
-    daily_water_data = get_daily_water_data(current_date)
-
-    # Current water data format: ['datetime.date(YYYY, MM, DD)', '0.0', 'n']
-    current_water_data = get_current_date_water_data(daily_water_data)
+    # Water data structure: [datetime.date(YYYY, MM, DD),0.0,'n']
+    # All water data is a list of all existing water data, sorted in descending order by date (latest date is first)
+    all_water_data = get_all_water_data_descending(current_date)
+    current_water_data = get_current_date_water_data(all_water_data)
 
     print("Date:{}".format(current_date))
     print(MENU)
@@ -76,7 +70,7 @@ def main():
 
             if current_water_data[COMPLETED_INDEX] != COMPLETED_CHARACTER:
                 if current_water_data[WATER_QUANTITY_INDEX] >= REQUIRED_DAILY_WATER_QUANTITY_LITRES:
-                    mark_daily_water_data_completed(current_water_data)
+                    mark_water_data_completed(current_water_data)
                     display_completed_required_daily_water_message()
         elif menu_input == "D":
             display_daily_water_intake_litres(current_water_data[WATER_QUANTITY_INDEX],
@@ -123,7 +117,7 @@ def main():
                 print(WEEK_SELECTOR_MENU)
                 week_menu_input = input(">>> ")
             dates_in_week_descending = get_dates_in_week_descending(dates_in_selected_week)
-            week_water_data = get_week_water_data_descending(dates_in_week_descending, daily_water_data)
+            week_water_data = get_week_water_data_descending(dates_in_week_descending, all_water_data)
             sort_week_water_data_ascending(week_water_data)
             display_week_water_data(week_water_data, current_date)
         elif menu_input == "M":
@@ -143,7 +137,7 @@ def main():
                 print(MONTH_SELECTOR_MENU)
                 month_menu_input = input(">>> ")
             dates_in_month_descending = get_dates_in_month_descending(calendar_dates, selected_month_date_obj)
-            month_water_data = get_month_water_data_descending(dates_in_month_descending, daily_water_data)
+            month_water_data = get_month_water_data_descending(dates_in_month_descending, all_water_data)
             sort_month_water_data_ascending(month_water_data)
             display_month_water_data(month_water_data, current_date)
         elif menu_input == "Y":
@@ -163,7 +157,7 @@ def main():
                 print(YEAR_SELECTOR_MENU)
                 year_menu_input = input(">>> ")
             dates_in_year_descending = get_dates_in_year_descending(calendar_dates, selected_year_date_obj)
-            year_water_data = get_year_water_data_descending(dates_in_year_descending, daily_water_data)
+            year_water_data = get_year_water_data_descending(dates_in_year_descending, all_water_data)
             sort_year_water_data_ascending(year_water_data)
             display_year_water_data(year_water_data, current_date)
         else:
@@ -173,8 +167,8 @@ def main():
             display_completed_required_daily_water_message()
         print(MENU)
         menu_input = input(">>> ").upper()
-    format_daily_water_data_for_save(daily_water_data)
-    save_daily_water_data_in_file(daily_water_data, WATER_DATA_FILE)
+    format_all_water_data_for_save(all_water_data)
+    save_all_water_data_in_file(all_water_data, WATER_DATA_FILE)
     print("Program terminated.")
 
 

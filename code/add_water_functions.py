@@ -11,6 +11,6 @@ def get_water_quantity_litres(current_water_quantity, required_daily_water_quant
     return water_quantity
 
 
-def mark_daily_water_data_completed(water_data):
+def mark_water_data_completed(water_data):
     water_data[COMPLETED_INDEX] = "y"
     return water_data

@@ -29,10 +29,10 @@ def get_dates_in_month_descending(calendar_dates, selected_month_date_obj):
     return dates_in_month
 
 
-def get_month_water_data_descending(dates_in_month_descending, daily_water_data):
+def get_month_water_data_descending(dates_in_month_descending, all_water_data):
     month_water_data = []
     for date in dates_in_month_descending:
-        for water_data in daily_water_data:
+        for water_data in all_water_data:
             # If date is older than current water_data date then there is no data, set to 0
             if date > water_data[DATE_INDEX]:
                 month_water_data.append([date, 0.0, 'n'])
@@ -41,7 +41,7 @@ def get_month_water_data_descending(dates_in_month_descending, daily_water_data)
                 month_water_data.append(water_data)
                 break
             # If last entry in save data but not at the selected date yet, set to 0
-            elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
+            elif water_data is all_water_data[LAST_ENTRY_INDEX]:
                 month_water_data.append([date, 0.0, 'n'])
     return month_water_data
 
