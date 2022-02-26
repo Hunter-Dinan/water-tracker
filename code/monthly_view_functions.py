@@ -1,4 +1,4 @@
-"""Functions for monthly view"""
+"""Functions for monthly view."""
 
 from operator import itemgetter
 

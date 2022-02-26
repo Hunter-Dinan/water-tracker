@@ -22,6 +22,9 @@ from get_and_save_data_to_file_functions import get_current_date_water_data
 from get_and_save_data_to_file_functions import format_daily_water_data_for_save
 from get_and_save_data_to_file_functions import save_daily_water_data_in_file
 
+from add_water_functions import get_water_quantity_litres
+from add_water_functions import mark_daily_water_data_completed
+
 from monthly_view_functions import get_dates_in_month_descending
 from monthly_view_functions import get_month_water_data_descending
 from monthly_view_functions import sort_month_water_data_ascending
@@ -56,31 +59,23 @@ def main():
     # Current water data format: ['datetime.date(YYYY, MM, DD)', '0.0', 'n']
     current_water_data = get_current_date_water_data(daily_water_data)
 
-    # NOTE(Hunter): Variable for current water quantity is a copy of the list value but is independent
-    # from the actual value and must be updated separately, this could be problematic if used incorrectly
-    # but it improves readability of the code. Ideally a pointer would be used but Python does not have
-    # pointers
-    current_water_quantity_litres = current_water_data[WATER_QUANTITY_INDEX]
-
     print("Date:{}".format(current_date))
     print(MENU)
     menu_input = input(">>> ").upper()
     while menu_input != "Q":
         if menu_input == "A":
-            display_daily_water_intake_litres(current_water_quantity_litres,
+            display_daily_water_intake_litres(current_water_data[WATER_QUANTITY_INDEX],
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
-            add_water_quantity_litres = get_water_quantity_litres(current_water_quantity_litres,
+            add_water_quantity_litres = get_water_quantity_litres(current_water_data[WATER_QUANTITY_INDEX],
                                                                   REQUIRED_DAILY_WATER_QUANTITY_LITRES)
-            current_water_quantity_litres += add_water_quantity_litres
-
-            update_current_water_data(current_water_quantity_litres, current_water_data)
+            current_water_data[WATER_QUANTITY_INDEX] += add_water_quantity_litres
 
             if current_water_data[COMPLETED_INDEX] != COMPLETED_CHARACTER:
-                if current_water_quantity_litres >= REQUIRED_DAILY_WATER_QUANTITY_LITRES:
-                    mark_daily_water_completed(current_water_data)
+                if current_water_data[WATER_QUANTITY_INDEX] >= REQUIRED_DAILY_WATER_QUANTITY_LITRES:
+                    mark_daily_water_data_completed(current_water_data)
                     display_completed_required_daily_water_message()
         elif menu_input == "D":
-            display_daily_water_intake_litres(current_water_quantity_litres,
+            display_daily_water_intake_litres(current_water_data[WATER_QUANTITY_INDEX],
                                               REQUIRED_DAILY_WATER_QUANTITY_LITRES)
         elif menu_input == "W":
             print("Weekly view")
@@ -231,37 +226,6 @@ def get_week_water_data(selected_week, daily_water_data):
             elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
                 week_water_data.append([date, 0.0, 'n'])
     return week_water_data
-
-
-def mark_daily_water_completed(water_data):
-    water_data[COMPLETED_INDEX] = "y"
-    return water_data
-
-
-def update_current_water_data(current_water_quantity, current_water_data):
-    current_water_data[WATER_QUANTITY_INDEX] = current_water_quantity
-    return current_water_data
-
-
-def get_valid_float(prompt):
-    """Get float input with exception-based error checking."""
-    is_valid_input = False
-    while not is_valid_input:
-        try:
-            float_number = float(input("{}".format(prompt)))
-            if float_number > 0:
-                is_valid_input = True
-            else:
-                print("Number must be > 0")
-        except ValueError:
-            print("Invalid input; enter a valid number")
-    return float_number
-
-
-def get_water_quantity_litres(current_water_quantity, required_daily_water_quantity):
-    print("Enter quantity of water to add in litres:")
-    water_quantity = get_valid_float(">>> ")
-    return water_quantity
 
 
 if __name__ == '__main__':
