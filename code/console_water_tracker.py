@@ -1,3 +1,5 @@
+"""Console display version of water tracker."""
+
 import datetime
 import calendar
 
@@ -42,9 +44,6 @@ from console_display_functions import display_daily_water_intake_litres
 from console_display_functions import display_week_water_data
 from console_display_functions import display_month_water_data
 from console_display_functions import display_year_water_data
-
-# TODO: Make separate average calculation functions for each of the views and remove them
-#  from this file (console_display_functions.py)
 
 
 def main():
