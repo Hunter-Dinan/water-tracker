@@ -1,21 +1,16 @@
 import datetime
 import calendar
-from operator import itemgetter
 
 from dateutil.relativedelta import relativedelta
 
 from config import WATER_DATA_FILE
 from config import MENU, WEEK_SELECTOR_MENU, MONTH_SELECTOR_MENU, YEAR_SELECTOR_MENU
 from config import REQUIRED_DAILY_WATER_QUANTITY_LITRES
-from config import DATE_INDEX
 from config import WATER_QUANTITY_INDEX
 from config import COMPLETED_INDEX
 from config import COMPLETED_CHARACTER
-from config import START_OF_WEEK_INDEX
-from config import END_OF_WEEK_INDEX
 from config import START_OF_MONTH_INDEX
 from config import END_OF_MONTH_INDEX
-from config import LAST_ENTRY_INDEX
 
 from get_and_save_data_to_file_functions import get_daily_water_data
 from get_and_save_data_to_file_functions import get_current_date_water_data
@@ -24,6 +19,14 @@ from get_and_save_data_to_file_functions import save_daily_water_data_in_file
 
 from add_water_functions import get_water_quantity_litres
 from add_water_functions import mark_daily_water_data_completed
+
+from weekly_view_functions import get_current_week_index
+from weekly_view_functions import get_dates_in_selected_week_string_format
+from weekly_view_functions import get_next_month_date_obj
+from weekly_view_functions import get_previous_month_date_obj
+from weekly_view_functions import get_dates_in_week_descending
+from weekly_view_functions import get_week_water_data_descending
+from weekly_view_functions import sort_week_water_data_ascending
 
 from monthly_view_functions import get_dates_in_month_week_format
 from monthly_view_functions import get_dates_in_month_descending
@@ -173,71 +176,6 @@ def main():
     format_daily_water_data_for_save(daily_water_data)
     save_daily_water_data_in_file(daily_water_data, WATER_DATA_FILE)
     print("Program terminated.")
-
-
-def sort_week_water_data_ascending(week_water_data):
-    week_water_data.sort(key=itemgetter(DATE_INDEX))
-    return week_water_data
-
-
-def get_dates_in_week_descending(dates_in_selected_week):
-    # Unlike monthly and yearly view versions of this function, the weekly version only needs to sort as it is already
-    # separated into individual dates
-    dates_in_week_descending = dates_in_selected_week.copy()
-    dates_in_week_descending.sort(reverse=True)
-    return dates_in_week_descending
-
-
-def get_dates_in_selected_week_string_format(dates_in_selected_week):
-    # String format: DD/MM - DD/MM
-    first_day = dates_in_selected_week[START_OF_WEEK_INDEX]
-    last_day = dates_in_selected_week[END_OF_WEEK_INDEX]
-    dates_in_selected_week_string_format = "{}/{} - {}/{}".format(first_day.day, first_day.month, last_day.day,
-                                                                  last_day.month)
-    return dates_in_selected_week_string_format
-
-
-def get_current_week_index(dates_in_month_week_format, current_date):
-    for week_index, week in enumerate(dates_in_month_week_format):
-        for day in week:
-            if current_date == day:
-                current_week_index = week_index
-    return current_week_index
-
-
-def get_next_month_date_obj(selected_month_date_obj):
-    if selected_month_date_obj.month < 12:
-        selected_month_date_obj += relativedelta(months=+1)
-    else:
-        selected_month_date_obj = selected_month_date_obj.replace(month=1)
-        selected_month_date_obj += relativedelta(year=+1)
-    return selected_month_date_obj
-
-
-def get_previous_month_date_obj(selected_month_date_obj):
-    if selected_month_date_obj.month > 1:
-        selected_month_date_obj += relativedelta(months=-1)
-    else:
-        selected_month_date_obj = selected_month_date_obj.replace(month=12)
-        selected_month_date_obj += relativedelta(years=-1)
-    return selected_month_date_obj
-
-
-def get_week_water_data_descending(dates_in_week_descending, daily_water_data):
-    week_water_data = []
-    for date in dates_in_week_descending:
-        for water_data in daily_water_data:
-            # If date is older than current water_data date then there is no data, set to 0
-            if date > water_data[DATE_INDEX]:
-                week_water_data.append([date, 0.0, 'n'])
-                break
-            elif date == water_data[DATE_INDEX]:
-                week_water_data.append(water_data)
-                break
-            # If last entry in save data but not at the selected date yet, set to 0
-            elif water_data is daily_water_data[LAST_ENTRY_INDEX]:
-                week_water_data.append([date, 0.0, 'n'])
-    return week_water_data
 
 
 if __name__ == '__main__':
