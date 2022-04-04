@@ -1,0 +1,91 @@
+#:import NoTransition kivy.uix.screenmanager.NoTransition
+WaterTrackerScreenManager:
+    transition: NoTransition()
+    DailyViewScreen:
+    WeeklyViewScreen:
+    MonthlyViewScreen:
+    YearlyViewScreen:
+
+<DailyViewScreen>:
+    name: 'daily_view'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Daily'
+        BoxLayout:
+            orientation: 'horizontal'
+            Button:
+                text: 'Daily'
+                on_release: app.root.current = 'daily_view'
+            Button:
+                text: 'Weekly'
+                on_release: app.root.current = 'weekly_view'
+            Button:
+                text: 'Monthly'
+                on_release: app.root.current = 'monthly_view'
+            Button:
+                text: 'Yearly'
+                on_release: app.root.current = 'yearly_view'
+
+<WeeklyViewScreen>:
+    name: 'weekly_view'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Weekly'
+        BoxLayout:
+            orientation: 'horizontal'
+            Button:
+                text: 'Daily'
+                on_release: app.root.current = 'daily_view'
+            Button:
+                text: 'Weekly'
+                on_release: app.root.current = 'weekly_view'
+            Button:
+                text: 'Monthly'
+                on_release: app.root.current = 'monthly_view'
+            Button:
+                text: 'Yearly'
+                on_release: app.root.current = 'yearly_view'
+
+<MonthlyViewScreen>:
+    name: 'monthly_view'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Monthly'
+        BoxLayout:
+            orientation: 'horizontal'
+            Button:
+                text: 'Daily'
+                on_release: app.root.current = 'daily_view'
+            Button:
+                text: 'Weekly'
+                on_release: app.root.current = 'weekly_view'
+            Button:
+                text: 'Monthly'
+                on_release: app.root.current = 'monthly_view'
+            Button:
+                text: 'Yearly'
+                on_release: app.root.current = 'yearly_view'
+
+<YearlyViewScreen>:
+    name: 'yearly_view'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Yearly'
+        BoxLayout:
+            orientation: 'horizontal'
+            Button:
+                text: 'Daily'
+                on_release: app.root.current = 'daily_view'
+            Button:
+                text: 'Weekly'
+                on_release: app.root.current = 'weekly_view'
+            Button:
+                text: 'Monthly'
+                on_release: app.root.current = 'monthly_view'
+            Button:
+                text: 'Yearly'
+                on_release: app.root.current = 'yearly_view'
